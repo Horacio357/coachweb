@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel admin — Britov.Coach</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <h1>Panel admin</h1>
+    <p class="lede">Iniciá sesión para editar fotos, videos, colores y la cinta de promoción.</p>
+    <div id="login-warning" class="hint" style="display:none;margin-bottom:14px;color:#f4c67a;"></div>
+    <form id="login-form">
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" required autocomplete="username" placeholder="admin@britov.coach">
+      </div>
+      <div class="field">
+        <label for="login-pass">Contraseña</label>
+        <input id="login-pass" type="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <div class="hint" id="login-error" style="color:#e0607a;margin-bottom:12px;"></div>
+      <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+    </form>
+    <p class="hint" style="margin-top:18px;">Credenciales iniciales: <strong>admin@britov.coach</strong> / <strong>admin</strong></p>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div class="admin-shell" id="admin-shell" style="display:none;">
+  <header class="admin-header">
+    <div class="brand">Britov<span>.Coach</span> — admin</div>
+    <div class="actions">
+      <span class="status-pill" id="sqlite-status">🟢 Base SQLite activa</span>
+      <button class="btn btn-danger" id="logout-btn">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- DASHBOARD DE ANALÍTICAS -->
+    <section class="panel">
+      <h2>📊 Dashboard de Analíticas</h2>
+      <p class="desc">Visualización en tiempo real de visitas a la web e interacciones con el contenido.</p>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="label">Visitas Totales</span>
+          <div class="val" id="stat-total-visits">0</div>
+        </div>
+        <div class="stat-card">
+          <span class="label">Visitas Hoy</span>
+          <div class="val" id="stat-today-visits">0</div>
+        </div>
+        <div class="stat-card">
+          <span class="label">Últimos 7 días</span>
+          <div class="val" id="stat-week-visits">0</div>
+        </div>
+        <div class="stat-card">
+          <span class="label">Fotos en Galería</span>
+          <div class="val" id="stat-photo-count">0</div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:20px;">
+        <div>
+          <h3 style="font-size:15px;margin-bottom:12px;color:var(--gray-300);">📷 Fotos más vistas</h3>
+          <div class="ranking-list" id="top-photos-list">
+            <p class="hint">Aún no hay datos de fotos vistas.</p>
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:15px;margin-bottom:12px;color:var(--gray-300);">🎬 Videos más vistos</h3>
+          <div class="ranking-list" id="top-videos-list">
+            <p class="hint">Aún no hay datos de videos vistos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BURBUJA DE WHATSAPP Y REDES SOCIALES -->
+    <section class="panel">
+      <h2>💬 Burbuja de WhatsApp y Redes Sociales</h2>
+      <p class="desc">Configurá los enlaces a tus redes sociales que aparecen en el footer y activa la burbuja flotante.</p>
+      
+      <div class="toggle-row">
+        <span>Activar Burbuja Flotante de WhatsApp</span>
+        <label class="switch">
+          <input type="checkbox" id="wa-bubble-active" checked>
+          <span class="track"></span>
+        </label>
+      </div>
+
+      <div class="field" style="margin-top:14px;">
+        <label for="wa-default-msg">Mensaje predeterminado de WhatsApp</label>
+        <input id="wa-default-msg" type="text" placeholder="Ej: ¡Hola! Quisiera más información sobre los entrenamientos.">
+      </div>
+
+      <div class="two-col" style="margin-top:16px;">
+        <div class="field"><label for="s-wsp">WhatsApp (número completo con código de país)</label><input id="s-wsp" type="text" placeholder="34123456789"></div>
+        <div class="field"><label for="s-ig">Instagram (link completo)</label><input id="s-ig" type="text" placeholder="https://instagram.com/tuperfil"></div>
+      </div>
+      
+      <div class="two-col">
+        <div class="field"><label for="s-fb">Facebook (link completo)</label><input id="s-fb" type="text" placeholder="https://facebook.com/tuperfil"></div>
+        <div class="field"><label for="s-tt">TikTok (link completo)</label><input id="s-tt" type="text" placeholder="https://tiktok.com/@tuperfil"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="field"><label for="s-yt">YouTube (link completo)</label><input id="s-yt" type="text" placeholder="https://youtube.com/@tucanal"></div>
+        <div class="field"><label for="s-li">LinkedIn (link completo)</label><input id="s-li" type="text" placeholder="https://linkedin.com/in/tuperfil"></div>
+      </div>
+    </section>
+
+    <!-- CINTA DE PROMOCIÓN -->
+    <section class="panel">
+      <h2>Cinta de promoción</h2>
+      <p class="desc">Aparece arriba del header y abajo en el footer, en el sitio público.</p>
+      <div class="toggle-row">
+        <span>Mostrar cinta</span>
+        <label class="switch">
+          <input type="checkbox" id="ribbon-active">
+          <span class="track"></span>
+        </label>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label for="ribbon-text">Texto de la cinta</label>
+        <input id="ribbon-text" type="text" maxlength="120" placeholder="Ej: Primera clase gratis este mes">
+      </div>
+    </section>
+
+    <!-- COLORES -->
+    <section class="panel">
+      <h2>Colores</h2>
+      <p class="desc">Paleta negro / violeta / gris del sitio. Se aplica en vivo a toda la web.</p>
+      <div class="color-grid">
+        <div class="field"><label for="c-black">Fondo (negro)</label><input id="c-black" type="color"></div>
+        <div class="field"><label for="c-charcoal">Tarjetas (gris oscuro)</label><input id="c-charcoal" type="color"></div>
+        <div class="field"><label for="c-violetDeep">Violeta profundo</label><input id="c-violetDeep" type="color"></div>
+        <div class="field"><label for="c-violet">Violeta medio</label><input id="c-violet" type="color"></div>
+        <div class="field"><label for="c-violetBright">Violeta acento</label><input id="c-violetBright" type="color"></div>
+        <div class="field"><label for="c-gray">Gris texto</label><input id="c-gray" type="color"></div>
+      </div>
+    </section>
+
+    <!-- FOTOS -->
+    <section class="panel">
+      <h2>Galería de fotos</h2>
+      <p class="desc">
+        Podés <strong>subir fotos desde tu computadora</strong> o pegar un link directo (Instagram, Google Drive, Imgur).
+        Se muestran en la sección Galería y en el footer.
+      </p>
+      <div class="item-list" id="photo-list"></div>
+      <button class="btn btn-danger" id="add-photo" type="button">+ Agregar foto</button>
+    </section>
+
+    <!-- VIDEOS -->
+    <section class="panel">
+      <h2>Videos</h2>
+      <p class="desc">Pegá un link de YouTube o Vimeo. Se convierte a video incrustado automáticamente.</p>
+      <div class="item-list" id="video-list"></div>
+      <button class="btn btn-danger" id="add-video" type="button">+ Agregar video</button>
+    </section>
+
+    <!-- TEXTOS -->
+    <section class="panel">
+      <h2>Textos generales</h2>
+      <p class="desc">Marca, portada y contacto.</p>
+      <div class="field"><label for="t-brand">Marca (formato Nombre.Palabra)</label><input id="t-brand" type="text"></div>
+      <div class="two-col">
+        <div class="field"><label for="t-hero-kicker">Portada — texto pequeño</label><input id="t-hero-kicker" type="text"></div>
+        <div class="field"><label for="t-hero-heading">Portada — título</label><input id="t-hero-heading" type="text"></div>
+      </div>
+      <div class="field"><label for="t-hero-sub">Portada — bajada</label><textarea id="t-hero-sub" rows="2"></textarea></div>
+      <div class="two-col">
+        <div class="field"><label for="t-wsp">WhatsApp Contacto (número)</label><input id="t-wsp" type="text" placeholder="34123456789"></div>
+        <div class="field"><label for="t-ig">Instagram Contacto (link)</label><input id="t-ig" type="text" placeholder="https://instagram.com/..."></div>
+      </div>
+    </section>
+
+    <!-- CAMBIAR CONTRASEÑA -->
+    <section class="panel">
+      <h2>Seguridad / Cambiar contraseña</h2>
+      <p class="desc">Cambiá la contraseña del usuario administrador actual.</p>
+      <form id="change-pass-form" style="max-width:400px;">
+        <div class="field">
+          <label for="new-pass">Nueva contraseña</label>
+          <input id="new-pass" type="password" required minlength="4" placeholder="••••••••">
+        </div>
+        <div id="pass-msg" class="hint" style="margin-bottom:10px;"></div>
+        <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
+      </form>
+    </section>
+
+  </main>
+
+  <div class="save-bar">
+    <span class="hint" id="save-status" style="align-self:center;margin-right:auto;"></span>
+    <button class="btn btn-primary" id="save-btn">Guardar cambios</button>
+  </div>
+</div>
+
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>

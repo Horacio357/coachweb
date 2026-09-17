@@ -1,0 +1,16 @@
+{
+  "name": "britov-coach",
+  "version": "1.0.0",
+  "description": "Sitio web Britov.Coach con backend SQLite y admin local",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

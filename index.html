@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Britov.Coach — Entrenamiento personal</title>
+<meta name="description" content="Entrenamiento personal y grupal con plan a medida y seguimiento real.">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<div class="ribbon" id="ribbon" hidden>
+  <span id="ribbon-text"></span>
+</div>
+
+<header class="site-header">
+  <div class="wrap nav-inner">
+    <a href="#" class="brand" id="brand-logo">Britov<span>.Coach</span></a>
+    <nav class="main-nav" id="main-nav">
+      <a href="#about">Sobre mí</a>
+      <a href="#services">Servicios</a>
+      <a href="#gallery">Galería</a>
+      <a href="#videos">Videos</a>
+      <a href="#contact">Contacto</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#contact" class="btn btn-primary">Reservar</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="beam"></div>
+      <div class="beam b2"></div>
+    </div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="kicker" id="hero-kicker"></span>
+        <h1 id="hero-heading"></h1>
+        <p class="subhead" id="hero-subhead"></p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary" id="hero-cta-1"></a>
+          <a href="#services" class="btn btn-ghost" id="hero-cta-2"></a>
+        </div>
+      </div>
+      <div class="hero-visual" id="hero-visual">
+        <svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 7v10M18 7v10M3 12h3M18 12h3M9 12h6"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap about-grid">
+      <div class="about-photo" id="about-photo">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--violet-500);opacity:.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      </div>
+      <div>
+        <div class="section-head">
+          <h2 id="about-heading"></h2>
+        </div>
+        <p id="about-text" style="color:var(--gray-300);font-size:16px;"></p>
+        <div class="badge"><span class="dot"></span> Certificación Personal Training &amp; Group Fitness — ORTHOS Barcelona</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Servicios</h2>
+        <p class="lede">Tres formas de entrenar, un solo criterio: plan claro y seguimiento constante.</p>
+      </div>
+      <div class="services-row" id="services-row"></div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Cómo trabajamos</h2>
+      </div>
+      <div class="process-row" id="process-row"></div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Galería</h2>
+        <p class="lede">Elegí una foto desde la cinta al final de la página para verla en grande acá.</p>
+      </div>
+      <div class="gallery-viewer" id="gallery-viewer">
+        <p class="gallery-empty" id="gallery-empty">Todavía no hay fotos cargadas. Se agregan desde el panel admin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section id="videos">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Videos</h2>
+      </div>
+      <div class="video-grid" id="video-grid"></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact-block">
+        <div>
+          <h2 id="contact-heading" style="font-size:clamp(26px,3vw,34px);"></h2>
+          <p id="contact-text" style="color:var(--gray-300);margin-top:16px;font-size:15.5px;"></p>
+          <div id="contact-links" style="margin-top:26px;display:flex;gap:14px;flex-wrap:wrap;"></div>
+        </div>
+        <form class="contact-form" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="contacto">
+          <p hidden><label>No completar: <input name="bot-field"></label></p>
+          <label for="f-name">Nombre</label>
+          <input id="f-name" name="nombre" type="text" required>
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" required>
+          <label for="f-msg">Contame tu objetivo</label>
+          <textarea id="f-msg" name="mensaje" rows="4" required></textarea>
+          <button type="submit" class="btn btn-primary" style="margin-top:6px;">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-top">
+    <div class="footer-brand">
+      <a href="#" class="brand"><span id="footer-brand-1">Britov</span><span style="color:var(--violet-500)" id="footer-brand-2">.Coach</span></a>
+      <p>Entrenamiento personal y grupal en Barcelona, con seguimiento real de cada plan.</p>
+      <div class="footer-social" id="footer-social"></div>
+    </div>
+    <div>
+      <p class="filmstrip-label">Galería — elegí una foto para verla arriba</p>
+      <div class="filmstrip" id="filmstrip"></div>
+    </div>
+  </div>
+  <div class="ribbon" id="ribbon-footer" hidden>
+    <span id="ribbon-text-footer"></span>
+  </div>
+  <div class="wrap footer-bottom">
+    <span id="footer-copy"></span>
+    <a href="/admin/">Panel admin</a>
+  </div>
+<!-- BURBUJA FLOTANTE WHATSAPP -->
+<div id="whatsapp-bubble" class="wa-bubble-wrap" hidden></div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/site.js"></script>
+</body>
+</html>
