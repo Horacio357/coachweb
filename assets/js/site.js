@@ -307,12 +307,19 @@
       grid.innerHTML = `<p style="color:var(--gray-500);font-size:14px;">Todavía no hay videos cargados. Se agregan desde el panel admin.</p>`;
       return;
     }
-    grid.innerHTML = list.map(v => `
-      <div class="video-card">
-        <div class="frame-wrap"><iframe src="${toEmbedUrl(v.url)}" title="${escapeHtml(v.caption || "")}" allowfullscreen loading="lazy"></iframe></div>
-        <div class="cap">${escapeHtml(v.caption || "")}</div>
-      </div>
-    `).join("");
+    grid.innerHTML = list.map(v => {
+      const videoInfo = toEmbedUrl(v.url);
+      const mediaHtml = videoInfo.isDirectFile
+        ? `<video src="${escapeAttr(videoInfo.url)}" controls preload="metadata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;background:#000;"></video>`
+        : `<iframe src="${escapeAttr(videoInfo.url)}" title="${escapeHtml(v.caption || "")}" allowfullscreen loading="lazy"></iframe>`;
+
+      return `
+        <div class="video-card">
+          <div class="frame-wrap">${mediaHtml}</div>
+          <div class="cap">${escapeHtml(v.caption || "")}</div>
+        </div>
+      `;
+    }).join("");
 
     grid.querySelectorAll(".video-card").forEach((card, idx) => {
       card.addEventListener("click", () => {
@@ -321,22 +328,44 @@
     });
   }
 
-  function toEmbedUrl(url) {
+  function toEmbedUrl(rawUrl) {
+    if (!rawUrl) return { isDirectFile: false, url: "" };
+    const url = rawUrl.trim();
+
+    const ext = url.split(/[?#]/)[0].split('.').pop().toLowerCase();
+    const isDirectFile = /^(mp4|webm|mov|ogg|m4v)$/.test(ext) || url.startsWith("/uploads/video-");
+    if (isDirectFile) {
+      return { isDirectFile: true, url: url };
+    }
+
     try {
+      if (url.includes("youtube.com/shorts/")) {
+        const id = url.split("youtube.com/shorts/")[1].split(/[?&]/)[0];
+        return { isDirectFile: false, url: `https://www.youtube.com/embed/${id}` };
+      }
       if (url.includes("youtube.com/watch?v=")) {
         const id = new URL(url).searchParams.get("v");
-        return `https://www.youtube.com/embed/${id}`;
+        return { isDirectFile: false, url: `https://www.youtube.com/embed/${id}` };
       }
       if (url.includes("youtu.be/")) {
         const id = url.split("youtu.be/")[1].split(/[?&]/)[0];
-        return `https://www.youtube.com/embed/${id}`;
+        return { isDirectFile: false, url: `https://www.youtube.com/embed/${id}` };
       }
-      if (url.includes("vimeo.com/")) {
+      if (url.includes("vimeo.com/") && !url.includes("player.vimeo.com")) {
         const id = url.split("vimeo.com/")[1].split(/[?&]/)[0];
-        return `https://player.vimeo.com/video/${id}`;
+        return { isDirectFile: false, url: `https://player.vimeo.com/video/${id}` };
+      }
+      if (url.includes("instagram.com/reel/") || url.includes("instagram.com/p/")) {
+        const parts = url.split("/").filter(Boolean);
+        const typeIdx = parts.findIndex(p => p === "reel" || p === "p");
+        if (typeIdx !== -1 && parts[typeIdx + 1]) {
+          const id = parts[typeIdx + 1];
+          return { isDirectFile: false, url: `https://www.instagram.com/${parts[typeIdx]}/${id}/embed` };
+        }
       }
     } catch (e) { /* fall through */ }
-    return url;
+
+    return { isDirectFile: false, url: url };
   }
 
   function renderGalleryAndFilmstrip(gallerySection, gallery) {

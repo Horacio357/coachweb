@@ -573,22 +573,62 @@
   function videoRow(item, i) {
     const row = document.createElement("div");
     row.className = "item-row";
-    row.style.gridTemplateColumns = "1fr 1fr auto";
+    row.style.gridTemplateColumns = "1fr 1fr auto auto";
     row.innerHTML = `
-      <input type="text" data-field="url" placeholder="Link de YouTube o Vimeo" value="${escapeAttr(item.url)}">
+      <input type="text" data-field="url" placeholder="URL de YouTube, Shorts, Reels o subir video..." value="${escapeAttr(item.url)}">
       <input type="text" data-field="caption" placeholder="Descripción" value="${escapeAttr(item.caption)}">
+      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Subir video desde tu computadora">
+        📁 Subir Video
+        <input type="file" accept="video/*" class="video-upload-input" style="display:none;">
+      </label>
       <button type="button" class="remove">Quitar</button>
     `;
-    row.querySelector('[data-field="url"]').addEventListener("input", (e) => {
+
+    const urlInput = row.querySelector('[data-field="url"]');
+    const captionInput = row.querySelector('[data-field="caption"]');
+    const fileInput = row.querySelector(".video-upload-input");
+
+    urlInput.addEventListener("input", (e) => {
       currentContent.videos[i].url = e.target.value;
     });
-    row.querySelector('[data-field="caption"]').addEventListener("input", (e) => {
+
+    captionInput.addEventListener("input", (e) => {
       currentContent.videos[i].caption = e.target.value;
     });
+
+    fileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("photo", file);
+      urlInput.value = "Subiendo video (por favor espere)...";
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          urlInput.value = data.url;
+          currentContent.videos[i].url = data.url;
+        } else {
+          alert("Error al subir video: " + (data.error || "Desconocido"));
+          urlInput.value = currentContent.videos[i].url || "";
+        }
+      } catch (err) {
+        alert("Error de conexión al subir el video.");
+        urlInput.value = currentContent.videos[i].url || "";
+      }
+    });
+
     row.querySelector(".remove").addEventListener("click", () => {
       currentContent.videos.splice(i, 1);
       renderVideoList();
     });
+
     return row;
   }
 
