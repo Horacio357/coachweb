@@ -343,6 +343,29 @@ app.post("/api/upload", (req, res) => {
   });
 });
 
+// 5b. Endpoint para carga masiva de fotos (hasta 50 fotos juntas)
+app.post("/api/upload-multiple", (req, res) => {
+  if (!verifyToken(req)) {
+    return res.status(401).json({ error: "No autorizado. Inicie sesión nuevamente." });
+  }
+
+  upload.array("photos", 50)(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    if (!req.files || !req.files.length) {
+      return res.status(400).json({ error: "No se seleccionaron archivos para subir." });
+    }
+
+    const files = req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      filename: file.filename
+    }));
+
+    res.json({ success: true, files });
+  });
+});
+
 // 6. Cambiar contraseña admin
 app.post("/api/change-password", (req, res) => {
   if (!verifyToken(req)) {

@@ -261,10 +261,40 @@
     });
   }
 
+  function updateFieldPreview(textInputId, previewImgId, previewBoxId) {
+    const textInput = document.getElementById(textInputId);
+    const previewImg = document.getElementById(previewImgId);
+    const previewBox = document.getElementById(previewBoxId);
+    if (!textInput || !previewImg || !previewBox) return;
+
+    const val = textInput.value.trim();
+    if (val && !val.startsWith("Subiendo")) {
+      previewImg.src = val;
+      previewBox.style.display = "block";
+    } else {
+      previewBox.style.display = "none";
+    }
+  }
+
   function setupFileUploads() {
-    const bindUpload = (fileInputId, textInputId) => {
+    const bindUpload = (fileInputId, textInputId, clearBtnId, previewImgId, previewBoxId) => {
       const fileInput = document.getElementById(fileInputId);
       const textInput = document.getElementById(textInputId);
+      const clearBtn = document.getElementById(clearBtnId);
+
+      if (textInput) {
+        textInput.addEventListener("input", () => {
+          updateFieldPreview(textInputId, previewImgId, previewBoxId);
+        });
+      }
+
+      if (clearBtn && textInput) {
+        clearBtn.addEventListener("click", () => {
+          textInput.value = "";
+          updateFieldPreview(textInputId, previewImgId, previewBoxId);
+        });
+      }
+
       if (!fileInput || !textInput) return;
 
       fileInput.addEventListener("change", async (e) => {
@@ -274,6 +304,7 @@
         const formData = new FormData();
         formData.append("photo", file);
         textInput.value = "Subiendo...";
+        updateFieldPreview(textInputId, previewImgId, previewBoxId);
 
         try {
           const res = await fetch("/api/upload", {
@@ -284,21 +315,75 @@
           const data = await res.json();
           if (res.ok && data.success) {
             textInput.value = data.url;
+            updateFieldPreview(textInputId, previewImgId, previewBoxId);
           } else {
             alert("Error al subir imagen: " + (data.error || "Desconocido"));
             textInput.value = "";
+            updateFieldPreview(textInputId, previewImgId, previewBoxId);
           }
         } catch (err) {
           alert("Error de conexión al subir la imagen.");
           textInput.value = "";
+          updateFieldPreview(textInputId, previewImgId, previewBoxId);
         }
       });
     };
 
-    bindUpload("file-bg-hero", "bg-hero-img");
-    bindUpload("file-bg-about", "bg-about-img");
-    bindUpload("file-bg-contact", "bg-contact-img");
-    bindUpload("file-about-img", "t-about-img");
+    bindUpload("file-bg-hero", "bg-hero-img", "clear-bg-hero", "preview-bg-hero", "preview-box-bg-hero");
+    bindUpload("file-bg-about", "bg-about-img", "clear-bg-about", "preview-bg-about", "preview-box-bg-about");
+    bindUpload("file-bg-contact", "bg-contact-img", "clear-bg-contact", "preview-bg-contact", "preview-box-bg-contact");
+    bindUpload("file-about-img", "t-about-img", "clear-about-img", "preview-about-img", "preview-box-about-img");
+
+    setupBulkUpload();
+  }
+
+  function setupBulkUpload() {
+    const bulkInput = document.getElementById("bulk-photo-upload");
+    const statusSpan = document.getElementById("bulk-upload-status");
+    if (!bulkInput) return;
+
+    bulkInput.addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+
+      if (statusSpan) {
+        statusSpan.style.color = "var(--violet-200)";
+        statusSpan.textContent = `⏳ Subiendo ${files.length} fotos...`;
+      }
+
+      const formData = new FormData();
+      files.forEach(f => formData.append("photos", f));
+
+      try {
+        const res = await fetch("/api/upload-multiple", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success && Array.isArray(data.files)) {
+          data.files.forEach(item => {
+            currentContent.gallery.push({ url: item.url, caption: "" });
+          });
+          renderPhotoList();
+          if (statusSpan) {
+            statusSpan.style.color = "#9ee6b8";
+            statusSpan.textContent = `✅ ¡${data.files.length} fotos cargadas exitosamente!`;
+            setTimeout(() => { statusSpan.textContent = ""; }, 5000);
+          }
+        } else {
+          alert("Error en la carga masiva: " + (data.error || "Desconocido"));
+          if (statusSpan) statusSpan.textContent = "";
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error de conexión durante la carga masiva.");
+        if (statusSpan) statusSpan.textContent = "";
+      } finally {
+        bulkInput.value = "";
+      }
+    });
   }
 
   function populateForm() {
@@ -325,14 +410,17 @@
     document.getElementById("bg-hero-img").value = (bg.hero && bg.hero.image) || "";
     document.getElementById("bg-hero-opacity").value = Math.round(((bg.hero && bg.hero.opacity !== undefined) ? bg.hero.opacity : 0.35) * 100);
     document.getElementById("bg-hero-opacity-val").textContent = Math.round(((bg.hero && bg.hero.opacity !== undefined) ? bg.hero.opacity : 0.35) * 100) + "%";
+    updateFieldPreview("bg-hero-img", "preview-bg-hero", "preview-box-bg-hero");
 
     document.getElementById("bg-about-img").value = (bg.about && bg.about.image) || "";
     document.getElementById("bg-about-opacity").value = Math.round(((bg.about && bg.about.opacity !== undefined) ? bg.about.opacity : 0.20) * 100);
     document.getElementById("bg-about-opacity-val").textContent = Math.round(((bg.about && bg.about.opacity !== undefined) ? bg.about.opacity : 0.20) * 100) + "%";
+    updateFieldPreview("bg-about-img", "preview-bg-about", "preview-box-bg-about");
 
     document.getElementById("bg-contact-img").value = (bg.contact && bg.contact.image) || "";
     document.getElementById("bg-contact-opacity").value = Math.round(((bg.contact && bg.contact.opacity !== undefined) ? bg.contact.opacity : 0.30) * 100);
     document.getElementById("bg-contact-opacity-val").textContent = Math.round(((bg.contact && bg.contact.opacity !== undefined) ? bg.contact.opacity : 0.30) * 100) + "%";
+    updateFieldPreview("bg-contact-img", "preview-bg-contact", "preview-box-bg-contact");
 
     // Menú Navegación
     const nav = c.nav || {};
@@ -365,6 +453,7 @@
     document.getElementById("t-about-text").value = c.about.text || "";
     document.getElementById("t-about-badge").value = c.about.badge || "";
     document.getElementById("t-about-img").value = c.about.image || "";
+    updateFieldPreview("t-about-img", "preview-about-img", "preview-box-about-img");
 
     // Secciones Encabezados
     const ss = c.servicesSection || {};
@@ -434,11 +523,11 @@
         <input type="text" data-field="url" placeholder="URL de la foto de portada..." value="${escapeAttr(item.url)}" style="width:100%;">
       </div>
       <input type="text" data-field="caption" placeholder="Descripción corta (opcional)" value="${escapeAttr(item.caption)}">
-      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Subir foto desde tu computadora">
-        📁 Subir
+      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Cambiar foto desde tu computadora">
+        📁 Cambiar foto
         <input type="file" accept="image/*" class="file-upload-input" style="display:none;">
       </label>
-      <button type="button" class="remove">Quitar</button>
+      <button type="button" class="remove" title="Quitar esta foto">❌ Quitar</button>
     `;
 
     const urlInput = row.querySelector('[data-field="url"]');
@@ -510,11 +599,11 @@
         <input type="text" data-field="url" placeholder="URL o subir archivo..." value="${escapeAttr(item.url)}" style="width:100%;">
       </div>
       <input type="text" data-field="caption" placeholder="Descripción" value="${escapeAttr(item.caption)}">
-      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Subir foto desde tu computadora">
-        📁 Subir
+      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Cambiar foto desde tu computadora">
+        📁 Cambiar foto
         <input type="file" accept="image/*" class="file-upload-input" style="display:none;">
       </label>
-      <button type="button" class="remove">Quitar</button>
+      <button type="button" class="remove" title="Quitar esta foto">❌ Quitar</button>
     `;
 
     const urlInput = row.querySelector('[data-field="url"]');
@@ -582,11 +671,11 @@
     row.innerHTML = `
       <input type="text" data-field="url" placeholder="URL de YouTube, Shorts, Reels o subir video..." value="${escapeAttr(item.url)}">
       <input type="text" data-field="caption" placeholder="Descripción" value="${escapeAttr(item.caption)}">
-      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Subir video desde tu computadora">
-        📁 Subir Video
+      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Cambiar video desde tu computadora">
+        📁 Cambiar video
         <input type="file" accept="video/*" class="video-upload-input" style="display:none;">
       </label>
-      <button type="button" class="remove">Quitar</button>
+      <button type="button" class="remove" title="Quitar este video">❌ Quitar</button>
     `;
 
     const urlInput = row.querySelector('[data-field="url"]');

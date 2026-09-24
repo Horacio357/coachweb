@@ -96,10 +96,14 @@
             <label for="bg-hero-img">Imagen de Fondo (URL o subir)</label>
             <div style="display:flex;gap:8px;">
               <input id="bg-hero-img" type="text" placeholder="URL de la imagen...">
-              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
-                📁 Subir
+              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;" title="Subir o cambiar foto de fondo">
+                📁 Cambiar
                 <input type="file" accept="image/*" id="file-bg-hero" style="display:none;">
               </label>
+              <button type="button" class="btn btn-danger" id="clear-bg-hero" style="padding:8px 12px;font-size:12px;flex-shrink:0;" title="Quitar foto de fondo">❌ Quitar</button>
+            </div>
+            <div id="preview-box-bg-hero" style="margin-top:8px;display:none;">
+              <img id="preview-bg-hero" src="" alt="Vista previa" style="height:55px;border-radius:6px;object-fit:cover;border:1px solid rgba(247,245,251,.14);">
             </div>
           </div>
           <div class="field">
@@ -117,10 +121,14 @@
             <label for="bg-about-img">Imagen de Fondo (URL o subir)</label>
             <div style="display:flex;gap:8px;">
               <input id="bg-about-img" type="text" placeholder="URL de la imagen...">
-              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
-                📁 Subir
+              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;" title="Subir o cambiar foto de fondo">
+                📁 Cambiar
                 <input type="file" accept="image/*" id="file-bg-about" style="display:none;">
               </label>
+              <button type="button" class="btn btn-danger" id="clear-bg-about" style="padding:8px 12px;font-size:12px;flex-shrink:0;" title="Quitar foto de fondo">❌ Quitar</button>
+            </div>
+            <div id="preview-box-bg-about" style="margin-top:8px;display:none;">
+              <img id="preview-bg-about" src="" alt="Vista previa" style="height:55px;border-radius:6px;object-fit:cover;border:1px solid rgba(247,245,251,.14);">
             </div>
           </div>
           <div class="field">
@@ -138,10 +146,14 @@
             <label for="bg-contact-img">Imagen de Fondo (URL o subir)</label>
             <div style="display:flex;gap:8px;">
               <input id="bg-contact-img" type="text" placeholder="URL de la imagen...">
-              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
-                📁 Subir
+              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;" title="Subir o cambiar foto de fondo">
+                📁 Cambiar
                 <input type="file" accept="image/*" id="file-bg-contact" style="display:none;">
               </label>
+              <button type="button" class="btn btn-danger" id="clear-bg-contact" style="padding:8px 12px;font-size:12px;flex-shrink:0;" title="Quitar foto de fondo">❌ Quitar</button>
+            </div>
+            <div id="preview-box-bg-contact" style="margin-top:8px;display:none;">
+              <img id="preview-bg-contact" src="" alt="Vista previa" style="height:55px;border-radius:6px;object-fit:cover;border:1px solid rgba(247,245,251,.14);">
             </div>
           </div>
           <div class="field">
@@ -219,10 +231,14 @@
         <label for="t-about-img">Foto de Perfil (URL o subir)</label>
         <div style="display:flex;gap:8px;">
           <input id="t-about-img" type="text" placeholder="URL de la foto de perfil...">
-          <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
-            📁 Subir
+          <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;" title="Subir o cambiar foto de perfil">
+            📁 Cambiar
             <input type="file" accept="image/*" id="file-about-img" style="display:none;">
           </label>
+          <button type="button" class="btn btn-danger" id="clear-about-img" style="padding:8px 12px;font-size:12px;flex-shrink:0;" title="Quitar foto de perfil">❌ Quitar</button>
+        </div>
+        <div id="preview-box-about-img" style="margin-top:8px;display:none;">
+          <img id="preview-about-img" src="" alt="Vista previa" style="height:65px;border-radius:6px;object-fit:cover;border:1px solid rgba(247,245,251,.14);">
         </div>
       </div>
     </section>
@@ -270,9 +286,18 @@
     <!-- FOTOS -->
     <section class="panel">
       <h2>📸 Fotos de Galería</h2>
-      <p class="desc">Podés subir fotos o pegar links. Aparecen en la sección Galería y en el footer.</p>
+      <p class="desc">Podés realizar carga masiva (10, 20 o más fotos juntas), cambiar o quitar cualquier imagen. Aparecen en la sección Galería y en la cinta inferior.</p>
+      
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+        <label class="btn btn-primary" style="padding:10px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+          📁 Cargar fotos en lote (10/20 fotos juntas)
+          <input type="file" accept="image/*" id="bulk-photo-upload" multiple style="display:none;">
+        </label>
+        <button class="btn btn-danger" id="add-photo" type="button">+ Agregar foto individual</button>
+        <span id="bulk-upload-status" class="hint" style="margin:0;font-weight:500;"></span>
+      </div>
+
       <div class="item-list" id="photo-list"></div>
-      <button class="btn btn-danger" id="add-photo" type="button">+ Agregar foto a Galería</button>
     </section>
 
     <!-- VIDEOS -->
