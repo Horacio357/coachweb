@@ -1,5 +1,5 @@
 /* =========================================================
-   BRITOV.COACH — PANEL ADMIN COMPLETO (SQLITE & ANALYTICS)
+   BRITOV.COACH — PANEL ADMIN COMPLETO (SQLITE & HERO SLIDER)
    ========================================================= */
 (function () {
   "use strict";
@@ -24,12 +24,14 @@
     videoList: document.getElementById("video-list"),
     servicesList: document.getElementById("services-list"),
     processList: document.getElementById("process-list"),
+    heroPhotoList: document.getElementById("hero-photo-list"),
     
     // Botones de agregar
     addPhoto: document.getElementById("add-photo"),
     addVideo: document.getElementById("add-video"),
     addService: document.getElementById("add-service"),
     addProcessStep: document.getElementById("add-process-step"),
+    addHeroPhoto: document.getElementById("add-hero-photo"),
 
     // Seguridad
     changePassForm: document.getElementById("change-pass-form"),
@@ -296,7 +298,6 @@
     bindUpload("file-bg-hero", "bg-hero-img");
     bindUpload("file-bg-about", "bg-about-img");
     bindUpload("file-bg-contact", "bg-contact-img");
-    bindUpload("file-hero-img", "t-hero-img");
     bindUpload("file-about-img", "t-about-img");
   }
 
@@ -345,7 +346,14 @@
     document.getElementById("t-hero-sub").value = c.hero.subheading || "";
     document.getElementById("t-hero-cta1").value = c.hero.ctaPrimary || "";
     document.getElementById("t-hero-cta2").value = c.hero.ctaSecondary || "";
-    document.getElementById("t-hero-img").value = c.hero.image || "";
+
+    // Animación y Fotos de Portada (Hero Visual)
+    document.getElementById("hero-autoplay").checked = (c.hero.autoplay !== false);
+    document.getElementById("hero-interval").value = c.hero.interval || 4;
+
+    if ((!c.hero.images || c.hero.images.length === 0) && c.hero.image) {
+      c.hero.images = [{ url: c.hero.image, caption: "" }];
+    }
 
     // Sobre Mí
     document.getElementById("t-about-heading").value = c.about.heading || "";
@@ -397,6 +405,7 @@
     document.getElementById("s-li").value = soc.linkedin || "";
 
     // Renderizado listas dinámicas
+    renderHeroPhotoList();
     renderPhotoList();
     renderVideoList();
     renderServicesList();
@@ -404,6 +413,82 @@
   }
 
   /* ---------------- listas dinámicas ---------------- */
+  function renderHeroPhotoList() {
+    if (!els.heroPhotoList) return;
+    els.heroPhotoList.innerHTML = "";
+    (currentContent.hero.images || []).forEach((item, i) => els.heroPhotoList.appendChild(heroPhotoRow(item, i)));
+  }
+
+  function heroPhotoRow(item, i) {
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.style.gridTemplateColumns = "56px 1fr 1fr auto auto";
+    row.innerHTML = `
+      <img class="thumb" src="${item.url || ""}" alt="" onerror="this.style.opacity=0.2">
+      <div>
+        <input type="text" data-field="url" placeholder="URL de la foto de portada..." value="${escapeAttr(item.url)}" style="width:100%;">
+      </div>
+      <input type="text" data-field="caption" placeholder="Descripción corta (opcional)" value="${escapeAttr(item.caption)}">
+      <label class="btn btn-danger" style="padding:6px 10px;font-size:12px;cursor:pointer;" title="Subir foto desde tu computadora">
+        📁 Subir
+        <input type="file" accept="image/*" class="file-upload-input" style="display:none;">
+      </label>
+      <button type="button" class="remove">Quitar</button>
+    `;
+
+    const urlInput = row.querySelector('[data-field="url"]');
+    const thumbImg = row.querySelector(".thumb");
+    const captionInput = row.querySelector('[data-field="caption"]');
+    const fileInput = row.querySelector(".file-upload-input");
+
+    urlInput.addEventListener("input", (e) => {
+      currentContent.hero.images[i].url = e.target.value;
+      thumbImg.src = e.target.value;
+      thumbImg.style.opacity = "1";
+    });
+
+    captionInput.addEventListener("input", (e) => {
+      currentContent.hero.images[i].caption = e.target.value;
+    });
+
+    fileInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("photo", file);
+      urlInput.value = "Subiendo...";
+
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          urlInput.value = data.url;
+          currentContent.hero.images[i].url = data.url;
+          thumbImg.src = data.url;
+          thumbImg.style.opacity = "1";
+        } else {
+          alert("Error al subir imagen: " + (data.error || "Desconocido"));
+          urlInput.value = currentContent.hero.images[i].url || "";
+        }
+      } catch (err) {
+        alert("Error de conexión al subir la imagen.");
+        urlInput.value = currentContent.hero.images[i].url || "";
+      }
+    });
+
+    row.querySelector(".remove").addEventListener("click", () => {
+      currentContent.hero.images.splice(i, 1);
+      renderHeroPhotoList();
+    });
+
+    return row;
+  }
+
   function renderPhotoList() {
     els.photoList.innerHTML = "";
     currentContent.gallery.forEach((item, i) => els.photoList.appendChild(photoRow(item, i)));
@@ -562,6 +647,14 @@
   }
 
   // Eventos para botones de agregar
+  if (els.addHeroPhoto) {
+    els.addHeroPhoto.addEventListener("click", () => {
+      currentContent.hero.images = currentContent.hero.images || [];
+      currentContent.hero.images.push({ url: "", caption: "" });
+      renderHeroPhotoList();
+    });
+  }
+
   els.addPhoto.addEventListener("click", () => {
     currentContent.gallery.push({ url: "", caption: "" });
     renderPhotoList();
@@ -673,7 +766,13 @@
     c.hero.subheading = document.getElementById("t-hero-sub").value.trim();
     c.hero.ctaPrimary = document.getElementById("t-hero-cta1").value.trim();
     c.hero.ctaSecondary = document.getElementById("t-hero-cta2").value.trim();
-    c.hero.image = document.getElementById("t-hero-img").value.trim();
+
+    c.hero.autoplay = document.getElementById("hero-autoplay").checked;
+    c.hero.interval = parseInt(document.getElementById("hero-interval").value, 10) || 4;
+
+    if (c.hero.images && c.hero.images.length > 0) {
+      c.hero.image = c.hero.images[0].url;
+    }
 
     // Sobre Mí
     c.about.heading = document.getElementById("t-about-heading").value.trim();

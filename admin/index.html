@@ -174,7 +174,7 @@
     <!-- PORTADA (HERO) -->
     <section class="panel">
       <h2>🚀 Portada (Hero)</h2>
-      <p class="desc">Textos principales de la cabecera del sitio.</p>
+      <p class="desc">Textos principales de la cabecera del sitio y fotos destacadas de portada.</p>
       <div class="field"><label for="t-brand">Marca (formato Nombre.Palabra)</label><input id="t-brand" type="text"></div>
       <div class="two-col">
         <div class="field"><label for="t-hero-kicker">Texto pequeño (Kicker)</label><input id="t-hero-kicker" type="text"></div>
@@ -185,15 +185,26 @@
         <div class="field"><label for="t-hero-cta1">Botón Principal (CTA 1)</label><input id="t-hero-cta1" type="text"></div>
         <div class="field"><label for="t-hero-cta2">Botón Secundario (CTA 2)</label><input id="t-hero-cta2" type="text"></div>
       </div>
-      <div class="field">
-        <label for="t-hero-img">Foto de Portada Lateral (URL o subir)</label>
-        <div style="display:flex;gap:8px;">
-          <input id="t-hero-img" type="text" placeholder="URL de la foto lateral...">
-          <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
-            📁 Subir
-            <input type="file" accept="image/*" id="file-hero-img" style="display:none;">
+
+      <div style="border-top:1px solid rgba(247,245,251,.08);margin-top:20px;padding-top:16px;">
+        <h3 style="font-size:15px;margin-bottom:8px;color:var(--violet-200);">📸 Fotos Destacadas de Portada (Hero Visual)</h3>
+        <p class="desc">Podés agregar 2, 3 o más fotos. Se intercalan suavemente con una transición elegante.</p>
+
+        <div class="toggle-row" style="margin-bottom:14px;">
+          <span>Activar transición automática entre fotos</span>
+          <label class="switch">
+            <input type="checkbox" id="hero-autoplay" checked>
+            <span class="track"></span>
           </label>
         </div>
+
+        <div class="field" style="max-width:300px;margin-bottom:16px;">
+          <label for="hero-interval">Tiempo de cambio (segundos)</label>
+          <input id="hero-interval" type="number" min="1" max="20" value="4">
+        </div>
+
+        <div class="item-list" id="hero-photo-list"></div>
+        <button class="btn btn-danger" id="add-hero-photo" type="button">+ Agregar foto a portada</button>
       </div>
     </section>
 

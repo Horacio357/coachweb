@@ -154,6 +154,8 @@
     }
   }
 
+  let heroTimer = null;
+
   function renderHero(hero) {
     if (!hero) return;
     const kicker = document.getElementById("hero-kicker");
@@ -166,9 +168,78 @@
     if (subhead) subhead.textContent = hero.subheading || "";
     if (cta1) cta1.textContent = hero.ctaPrimary || "Reservar";
     if (cta2) cta2.textContent = hero.ctaSecondary || "Ver servicios";
-    if (hero.image) {
-      const box = document.getElementById("hero-visual");
-      if (box) box.innerHTML = `<img src="${hero.image}" alt="">`;
+
+    const box = document.getElementById("hero-visual");
+    if (!box) return;
+
+    if (heroTimer) {
+      clearInterval(heroTimer);
+      heroTimer = null;
+    }
+
+    let imageList = [];
+    if (Array.isArray(hero.images) && hero.images.length > 0) {
+      imageList = hero.images.filter(img => img && img.url);
+    }
+    if (!imageList.length && hero.image) {
+      imageList = [{ url: hero.image, caption: "" }];
+    }
+
+    if (!imageList.length) {
+      box.innerHTML = `<svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 7v10M18 7v10M3 12h3M18 12h3M9 12h6"/></svg>`;
+      return;
+    }
+
+    let html = imageList.map((item, i) => `
+      <img src="${item.url}" alt="${escapeHtml(item.caption || "")}" class="hero-slide ${i === 0 ? "active" : ""}" data-index="${i}">
+    `).join("");
+
+    if (imageList.length > 1) {
+      html += `<div class="hero-dots">` + imageList.map((_, i) => `
+        <button class="${i === 0 ? "active" : ""}" data-index="${i}" aria-label="Foto ${i + 1}"></button>
+      `).join("") + `</div>`;
+    }
+
+    box.innerHTML = html;
+
+    if (imageList.length <= 1) return;
+
+    let currentIndex = 0;
+    const slides = box.querySelectorAll(".hero-slide");
+    const dots = box.querySelectorAll(".hero-dots button");
+
+    function goToSlide(index) {
+      currentIndex = index;
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle("active", idx === currentIndex);
+      });
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("active", idx === currentIndex);
+      });
+    }
+
+    dots.forEach((dot, idx) => {
+      dot.addEventListener("click", () => {
+        goToSlide(idx);
+        resetTimer();
+      });
+    });
+
+    function nextSlide() {
+      const next = (currentIndex + 1) % imageList.length;
+      goToSlide(next);
+    }
+
+    function resetTimer() {
+      if (heroTimer) clearInterval(heroTimer);
+      if (hero.autoplay !== false) {
+        const intervalSec = (hero.interval && hero.interval > 0) ? hero.interval : 4;
+        heroTimer = setInterval(nextSlide, intervalSec * 1000);
+      }
+    }
+
+    if (hero.autoplay !== false) {
+      resetTimer();
     }
   }
 

@@ -43,7 +43,10 @@ const DEFAULT_CONTENT = {
     subheading: "Entrenamiento personalizado y grupal con seguimiento real: evaluación inicial, plan a medida y ajustes semana a semana.",
     ctaPrimary: "Reservar evaluación",
     ctaSecondary: "Ver servicios",
-    image: ""
+    image: "",
+    images: [],
+    autoplay: true,
+    interval: 4
   },
 
   about: {
