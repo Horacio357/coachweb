@@ -17,14 +17,15 @@
   <div class="wrap nav-inner">
     <a href="#" class="brand" id="brand-logo">Britov<span>.Coach</span></a>
     <nav class="main-nav" id="main-nav">
-      <a href="#about">Sobre mí</a>
-      <a href="#services">Servicios</a>
-      <a href="#gallery">Galería</a>
-      <a href="#videos">Videos</a>
-      <a href="#contact">Contacto</a>
+      <a href="#about" id="nav-about">Sobre mí</a>
+      <a href="#services" id="nav-services">Servicios</a>
+      <a href="#process" id="nav-process">Cómo trabajamos</a>
+      <a href="#gallery" id="nav-gallery">Galería</a>
+      <a href="#videos" id="nav-videos">Videos</a>
+      <a href="#contact" id="nav-contact">Contacto</a>
     </nav>
     <div class="nav-cta">
-      <a href="#contact" class="btn btn-primary">Reservar</a>
+      <a href="#contact" class="btn btn-primary" id="nav-cta-btn">Reservar</a>
       <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -35,6 +36,7 @@
 <main>
   <!-- HERO -->
   <section class="hero">
+    <div class="section-bg-layer" id="hero-bg-layer"></div>
     <div class="hero-bg" aria-hidden="true">
       <div class="beam"></div>
       <div class="beam b2"></div>
@@ -57,7 +59,8 @@
 
   <!-- ABOUT -->
   <section id="about">
-    <div class="wrap about-grid">
+    <div class="section-bg-layer" id="about-bg-layer"></div>
+    <div class="wrap about-grid" style="position:relative;z-index:1;">
       <div class="about-photo" id="about-photo">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--violet-500);opacity:.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
       </div>
@@ -66,7 +69,7 @@
           <h2 id="about-heading"></h2>
         </div>
         <p id="about-text" style="color:var(--gray-300);font-size:16px;"></p>
-        <div class="badge"><span class="dot"></span> Certificación Personal Training &amp; Group Fitness — ORTHOS Barcelona</div>
+        <div class="badge" id="about-badge-wrap"><span class="dot"></span> <span id="about-badge-text"></span></div>
       </div>
     </div>
   </section>
@@ -75,8 +78,8 @@
   <section id="services">
     <div class="wrap">
       <div class="section-head">
-        <h2>Servicios</h2>
-        <p class="lede">Tres formas de entrenar, un solo criterio: plan claro y seguimiento constante.</p>
+        <h2 id="services-heading">Servicios</h2>
+        <p class="lede" id="services-lede"></p>
       </div>
       <div class="services-row" id="services-row"></div>
     </div>
@@ -86,7 +89,8 @@
   <section id="process">
     <div class="wrap">
       <div class="section-head">
-        <h2>Cómo trabajamos</h2>
+        <h2 id="process-heading">Cómo trabajamos</h2>
+        <p class="lede" id="process-lede"></p>
       </div>
       <div class="process-row" id="process-row"></div>
     </div>
@@ -96,8 +100,8 @@
   <section id="gallery">
     <div class="wrap">
       <div class="section-head">
-        <h2>Galería</h2>
-        <p class="lede">Elegí una foto desde la cinta al final de la página para verla en grande acá.</p>
+        <h2 id="gallery-heading">Galería</h2>
+        <p class="lede" id="gallery-lede"></p>
       </div>
       <div class="gallery-viewer" id="gallery-viewer">
         <p class="gallery-empty" id="gallery-empty">Todavía no hay fotos cargadas. Se agregan desde el panel admin.</p>
@@ -109,7 +113,8 @@
   <section id="videos">
     <div class="wrap">
       <div class="section-head">
-        <h2>Videos</h2>
+        <h2 id="videos-heading">Videos</h2>
+        <p class="lede" id="videos-lede"></p>
       </div>
       <div class="video-grid" id="video-grid"></div>
     </div>
@@ -119,21 +124,22 @@
   <section id="contact">
     <div class="wrap">
       <div class="contact-block">
-        <div>
+        <div class="section-bg-layer" id="contact-bg-layer"></div>
+        <div style="position:relative;z-index:1;">
           <h2 id="contact-heading" style="font-size:clamp(26px,3vw,34px);"></h2>
           <p id="contact-text" style="color:var(--gray-300);margin-top:16px;font-size:15.5px;"></p>
           <div id="contact-links" style="margin-top:26px;display:flex;gap:14px;flex-wrap:wrap;"></div>
         </div>
-        <form class="contact-form" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <form class="contact-form" name="contacto" method="POST" data-netlify="true" netlify-honeypot="bot-field" style="position:relative;z-index:1;">
           <input type="hidden" name="form-name" value="contacto">
           <p hidden><label>No completar: <input name="bot-field"></label></p>
-          <label for="f-name">Nombre</label>
+          <label for="f-name" id="label-f-name">Nombre</label>
           <input id="f-name" name="nombre" type="text" required>
-          <label for="f-email">Email</label>
+          <label for="f-email" id="label-f-email">Email</label>
           <input id="f-email" name="email" type="email" required>
-          <label for="f-msg">Contame tu objetivo</label>
+          <label for="f-msg" id="label-f-msg">Contame tu objetivo</label>
           <textarea id="f-msg" name="mensaje" rows="4" required></textarea>
-          <button type="submit" class="btn btn-primary" style="margin-top:6px;">Enviar</button>
+          <button type="submit" class="btn btn-primary" id="btn-f-submit" style="margin-top:6px;">Enviar</button>
         </form>
       </div>
     </div>
@@ -144,11 +150,11 @@
   <div class="wrap footer-top">
     <div class="footer-brand">
       <a href="#" class="brand"><span id="footer-brand-1">Britov</span><span style="color:var(--violet-500)" id="footer-brand-2">.Coach</span></a>
-      <p>Entrenamiento personal y grupal en Barcelona, con seguimiento real de cada plan.</p>
+      <p id="footer-brand-desc"></p>
       <div class="footer-social" id="footer-social"></div>
     </div>
     <div>
-      <p class="filmstrip-label">Galería — elegí una foto para verla arriba</p>
+      <p class="filmstrip-label" id="footer-filmstrip-label">Galería — elegí una foto para verla arriba</p>
       <div class="filmstrip" id="filmstrip"></div>
     </div>
   </div>
@@ -159,6 +165,8 @@
     <span id="footer-copy"></span>
     <a href="/admin/">Panel admin</a>
   </div>
+</footer>
+
 <!-- BURBUJA FLOTANTE WHATSAPP -->
 <div id="whatsapp-bubble" class="wa-bubble-wrap" hidden></div>
 

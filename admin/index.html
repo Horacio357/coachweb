@@ -13,7 +13,7 @@
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <h1>Panel admin</h1>
-    <p class="lede">Iniciá sesión para editar fotos, videos, colores y la cinta de promoción.</p>
+    <p class="lede">Iniciá sesión para editar fotos, videos, colores y todos los textos del sitio.</p>
     <div id="login-warning" class="hint" style="display:none;margin-bottom:14px;color:#f4c67a;"></div>
     <form id="login-form">
       <div class="field">
@@ -83,10 +83,226 @@
       </div>
     </section>
 
+    <!-- FOTOS DE FONDO Y OPACIDAD -->
+    <section class="panel">
+      <h2>🖼️ Fotos de Fondo y Opacidad</h2>
+      <p class="desc">Subí imágenes de fondo y regulá su opacidad (transparencia) para las secciones principales.</p>
+      
+      <!-- HERO BACKGROUND -->
+      <div style="border-bottom:1px solid rgba(247,245,251,.08);padding-bottom:16px;margin-bottom:16px;">
+        <h3 style="font-size:15px;margin-bottom:8px;color:var(--violet-200);">Fondo Principal (Hero)</h3>
+        <div class="two-col">
+          <div class="field">
+            <label for="bg-hero-img">Imagen de Fondo (URL o subir)</label>
+            <div style="display:flex;gap:8px;">
+              <input id="bg-hero-img" type="text" placeholder="URL de la imagen...">
+              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
+                📁 Subir
+                <input type="file" accept="image/*" id="file-bg-hero" style="display:none;">
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bg-hero-opacity">Opacidad: <strong id="bg-hero-opacity-val">35%</strong></label>
+            <input id="bg-hero-opacity" type="range" min="0" max="100" value="35" style="margin-top:8px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT BACKGROUND -->
+      <div style="border-bottom:1px solid rgba(247,245,251,.08);padding-bottom:16px;margin-bottom:16px;">
+        <h3 style="font-size:15px;margin-bottom:8px;color:var(--violet-200);">Fondo Sección "Sobre mí"</h3>
+        <div class="two-col">
+          <div class="field">
+            <label for="bg-about-img">Imagen de Fondo (URL o subir)</label>
+            <div style="display:flex;gap:8px;">
+              <input id="bg-about-img" type="text" placeholder="URL de la imagen...">
+              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
+                📁 Subir
+                <input type="file" accept="image/*" id="file-bg-about" style="display:none;">
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bg-about-opacity">Opacidad: <strong id="bg-about-opacity-val">20%</strong></label>
+            <input id="bg-about-opacity" type="range" min="0" max="100" value="20" style="margin-top:8px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT BACKGROUND -->
+      <div>
+        <h3 style="font-size:15px;margin-bottom:8px;color:var(--violet-200);">Fondo Bloque de Contacto</h3>
+        <div class="two-col">
+          <div class="field">
+            <label for="bg-contact-img">Imagen de Fondo (URL o subir)</label>
+            <div style="display:flex;gap:8px;">
+              <input id="bg-contact-img" type="text" placeholder="URL de la imagen...">
+              <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
+                📁 Subir
+                <input type="file" accept="image/*" id="file-bg-contact" style="display:none;">
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bg-contact-opacity">Opacidad: <strong id="bg-contact-opacity-val">30%</strong></label>
+            <input id="bg-contact-opacity" type="range" min="0" max="100" value="30" style="margin-top:8px;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENÚ DE NAVEGACIÓN Y BOTÓN CTA -->
+    <section class="panel">
+      <h2>🧭 Menú de Navegación Superior</h2>
+      <p class="desc">Edita los textos de cada enlace del menú de navegación y del botón principal de acción.</p>
+      <div class="two-col">
+        <div class="field"><label for="n-about">Link 1: Sobre mí</label><input id="n-about" type="text"></div>
+        <div class="field"><label for="n-services">Link 2: Servicios</label><input id="n-services" type="text"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label for="n-process">Link 3: Cómo trabajamos</label><input id="n-process" type="text"></div>
+        <div class="field"><label for="n-gallery">Link 4: Galería</label><input id="n-gallery" type="text"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label for="n-videos">Link 5: Videos</label><input id="n-videos" type="text"></div>
+        <div class="field"><label for="n-contact">Link 6: Contacto</label><input id="n-contact" type="text"></div>
+      </div>
+      <div class="field"><label for="n-cta">Botón CTA del Header</label><input id="n-cta" type="text"></div>
+    </section>
+
+    <!-- PORTADA (HERO) -->
+    <section class="panel">
+      <h2>🚀 Portada (Hero)</h2>
+      <p class="desc">Textos principales de la cabecera del sitio.</p>
+      <div class="field"><label for="t-brand">Marca (formato Nombre.Palabra)</label><input id="t-brand" type="text"></div>
+      <div class="two-col">
+        <div class="field"><label for="t-hero-kicker">Texto pequeño (Kicker)</label><input id="t-hero-kicker" type="text"></div>
+        <div class="field"><label for="t-hero-heading">Título Principal</label><input id="t-hero-heading" type="text"></div>
+      </div>
+      <div class="field"><label for="t-hero-sub">Bajada / Subtítulo</label><textarea id="t-hero-sub" rows="2"></textarea></div>
+      <div class="two-col">
+        <div class="field"><label for="t-hero-cta1">Botón Principal (CTA 1)</label><input id="t-hero-cta1" type="text"></div>
+        <div class="field"><label for="t-hero-cta2">Botón Secundario (CTA 2)</label><input id="t-hero-cta2" type="text"></div>
+      </div>
+      <div class="field">
+        <label for="t-hero-img">Foto de Portada Lateral (URL o subir)</label>
+        <div style="display:flex;gap:8px;">
+          <input id="t-hero-img" type="text" placeholder="URL de la foto lateral...">
+          <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
+            📁 Subir
+            <input type="file" accept="image/*" id="file-hero-img" style="display:none;">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOBRE MÍ -->
+    <section class="panel">
+      <h2>👤 Sección "Sobre mí"</h2>
+      <p class="desc">Título, descripción, foto de perfil y texto de la insignia/badge.</p>
+      <div class="field"><label for="t-about-heading">Título de la sección</label><input id="t-about-heading" type="text"></div>
+      <div class="field"><label for="t-about-text">Texto de presentación</label><textarea id="t-about-text" rows="4"></textarea></div>
+      <div class="field"><label for="t-about-badge">Texto del Badge / Certificación</label><input id="t-about-badge" type="text"></div>
+      <div class="field">
+        <label for="t-about-img">Foto de Perfil (URL o subir)</label>
+        <div style="display:flex;gap:8px;">
+          <input id="t-about-img" type="text" placeholder="URL de la foto de perfil...">
+          <label class="btn btn-danger" style="padding:8px 12px;font-size:12px;cursor:pointer;flex-shrink:0;">
+            📁 Subir
+            <input type="file" accept="image/*" id="file-about-img" style="display:none;">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICIOS -->
+    <section class="panel">
+      <h2>💪 Sección "Servicios"</h2>
+      <p class="desc">Administrá el título, subtítulo y cada una de las tarjetas de servicios.</p>
+      <div class="two-col">
+        <div class="field"><label for="t-services-heading">Título de la sección</label><input id="t-services-heading" type="text"></div>
+        <div class="field"><label for="t-services-lede">Bajada / Descripción</label><input id="t-services-lede" type="text"></div>
+      </div>
+      <h3 style="font-size:15px;margin:16px 0 8px;color:var(--gray-300);">Tarjetas de Servicios</h3>
+      <div class="item-list" id="services-list"></div>
+      <button class="btn btn-danger" id="add-service" type="button">+ Agregar servicio</button>
+    </section>
+
+    <!-- CÓMO TRABAJAMOS (PROCESO) -->
+    <section class="panel">
+      <h2>⚡ Sección "Cómo trabajamos" (Proceso)</h2>
+      <p class="desc">Administrá los pasos del método de trabajo.</p>
+      <div class="two-col">
+        <div class="field"><label for="t-process-heading">Título de la sección</label><input id="t-process-heading" type="text"></div>
+        <div class="field"><label for="t-process-lede">Bajada / Descripción</label><input id="t-process-lede" type="text"></div>
+      </div>
+      <h3 style="font-size:15px;margin:16px 0 8px;color:var(--gray-300);">Pasos del Proceso</h3>
+      <div class="item-list" id="process-list"></div>
+      <button class="btn btn-danger" id="add-process-step" type="button">+ Agregar paso</button>
+    </section>
+
+    <!-- GALERÍA Y VIDEOS (TEXTOS DE ENCABEZADO) -->
+    <section class="panel">
+      <h2>🖼️ Textos de Galería y Videos</h2>
+      <p class="desc">Encabezados de las secciones de medios.</p>
+      <div class="two-col">
+        <div class="field"><label for="t-gallery-heading">Título Galería</label><input id="t-gallery-heading" type="text"></div>
+        <div class="field"><label for="t-gallery-lede">Bajada Galería</label><input id="t-gallery-lede" type="text"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label for="t-videos-heading">Título Videos</label><input id="t-videos-heading" type="text"></div>
+        <div class="field"><label for="t-videos-lede">Bajada Videos</label><input id="t-videos-lede" type="text"></div>
+      </div>
+    </section>
+
+    <!-- FOTOS -->
+    <section class="panel">
+      <h2>📸 Fotos de Galería</h2>
+      <p class="desc">Podés subir fotos o pegar links. Aparecen en la sección Galería y en el footer.</p>
+      <div class="item-list" id="photo-list"></div>
+      <button class="btn btn-danger" id="add-photo" type="button">+ Agregar foto a Galería</button>
+    </section>
+
+    <!-- VIDEOS -->
+    <section class="panel">
+      <h2>🎥 Lista de Videos</h2>
+      <p class="desc">Pegá un link de YouTube o Vimeo.</p>
+      <div class="item-list" id="video-list"></div>
+      <button class="btn btn-danger" id="add-video" type="button">+ Agregar video</button>
+    </section>
+
+    <!-- CONTACTO (TEXTOS Y LABELS) -->
+    <section class="panel">
+      <h2>📩 Sección de Contacto</h2>
+      <p class="desc">Edita títulos, bajadas y las etiquetas del formulario.</p>
+      <div class="field"><label for="t-contact-heading">Título de Contacto</label><input id="t-contact-heading" type="text"></div>
+      <div class="field"><label for="t-contact-text">Texto / Bajada de Contacto</label><textarea id="t-contact-text" rows="2"></textarea></div>
+      <div class="two-col">
+        <div class="field"><label for="t-contact-name-label">Etiqueta campo "Nombre"</label><input id="t-contact-name-label" type="text"></div>
+        <div class="field"><label for="t-contact-email-label">Etiqueta campo "Email"</label><input id="t-contact-email-label" type="text"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label for="t-contact-msg-label">Etiqueta campo "Mensaje"</label><input id="t-contact-msg-label" type="text"></div>
+        <div class="field"><label for="t-contact-btn-text">Texto del Botón Enviar</label><input id="t-contact-btn-text" type="text"></div>
+      </div>
+    </section>
+
+    <!-- FOOTER (TEXTOS) -->
+    <section class="panel">
+      <h2>🦶 Footer y Copyright</h2>
+      <p class="desc">Textos del pie de página.</p>
+      <div class="field"><label for="t-footer-desc">Descripción de la marca en el Footer</label><textarea id="t-footer-desc" rows="2"></textarea></div>
+      <div class="two-col">
+        <div class="field"><label for="t-footer-filmstrip-label">Etiqueta de cinta de fotos</label><input id="t-footer-filmstrip-label" type="text"></div>
+        <div class="field"><label for="t-footer-copy">Texto de Copyright</label><input id="t-footer-copy" type="text"></div>
+      </div>
+    </section>
+
     <!-- BURBUJA DE WHATSAPP Y REDES SOCIALES -->
     <section class="panel">
       <h2>💬 Burbuja de WhatsApp y Redes Sociales</h2>
-      <p class="desc">Configurá los enlaces a tus redes sociales que aparecen en el footer y activa la burbuja flotante.</p>
+      <p class="desc">Configurá los enlaces a tus redes sociales y la burbuja flotante.</p>
       
       <div class="toggle-row">
         <span>Activar Burbuja Flotante de WhatsApp</span>
@@ -145,41 +361,6 @@
         <div class="field"><label for="c-violet">Violeta medio</label><input id="c-violet" type="color"></div>
         <div class="field"><label for="c-violetBright">Violeta acento</label><input id="c-violetBright" type="color"></div>
         <div class="field"><label for="c-gray">Gris texto</label><input id="c-gray" type="color"></div>
-      </div>
-    </section>
-
-    <!-- FOTOS -->
-    <section class="panel">
-      <h2>Galería de fotos</h2>
-      <p class="desc">
-        Podés <strong>subir fotos desde tu computadora</strong> o pegar un link directo (Instagram, Google Drive, Imgur).
-        Se muestran en la sección Galería y en el footer.
-      </p>
-      <div class="item-list" id="photo-list"></div>
-      <button class="btn btn-danger" id="add-photo" type="button">+ Agregar foto</button>
-    </section>
-
-    <!-- VIDEOS -->
-    <section class="panel">
-      <h2>Videos</h2>
-      <p class="desc">Pegá un link de YouTube o Vimeo. Se convierte a video incrustado automáticamente.</p>
-      <div class="item-list" id="video-list"></div>
-      <button class="btn btn-danger" id="add-video" type="button">+ Agregar video</button>
-    </section>
-
-    <!-- TEXTOS -->
-    <section class="panel">
-      <h2>Textos generales</h2>
-      <p class="desc">Marca, portada y contacto.</p>
-      <div class="field"><label for="t-brand">Marca (formato Nombre.Palabra)</label><input id="t-brand" type="text"></div>
-      <div class="two-col">
-        <div class="field"><label for="t-hero-kicker">Portada — texto pequeño</label><input id="t-hero-kicker" type="text"></div>
-        <div class="field"><label for="t-hero-heading">Portada — título</label><input id="t-hero-heading" type="text"></div>
-      </div>
-      <div class="field"><label for="t-hero-sub">Portada — bajada</label><textarea id="t-hero-sub" rows="2"></textarea></div>
-      <div class="two-col">
-        <div class="field"><label for="t-wsp">WhatsApp Contacto (número)</label><input id="t-wsp" type="text" placeholder="34123456789"></div>
-        <div class="field"><label for="t-ig">Instagram Contacto (link)</label><input id="t-ig" type="text" placeholder="https://instagram.com/..."></div>
       </div>
     </section>
 

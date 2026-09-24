@@ -14,10 +14,27 @@
     } catch (e) { return null; }
   }
 
+  function deepMerge(target, source) {
+    const output = Object.assign({}, target);
+    if (isObject(target) && isObject(source)) {
+      Object.keys(source).forEach(key => {
+        if (isObject(source[key])) {
+          if (!(key in target)) Object.assign(output, { [key]: source[key] });
+          else output[key] = deepMerge(target[key], source[key]);
+        } else {
+          Object.assign(output, { [key]: source[key] });
+        }
+      });
+    }
+    return output;
+  }
+
+  function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+  }
+
   function mergeWithDefaults(data) {
-    const merged = Object.assign({}, DEFAULT_CONTENT, data || {});
-    merged.social = Object.assign({}, DEFAULT_CONTENT.social, (data && data.social) || {});
-    return merged;
+    return deepMerge(DEFAULT_CONTENT, data || {});
   }
 
   async function loadContent() {
@@ -68,6 +85,62 @@
     });
   }
 
+  function renderBackgrounds(backgrounds) {
+    if (!backgrounds) return;
+
+    // Hero Background
+    const heroLayer = document.getElementById("hero-bg-layer");
+    if (heroLayer) {
+      if (backgrounds.hero && backgrounds.hero.image) {
+        const opacity = backgrounds.hero.opacity !== undefined ? backgrounds.hero.opacity : 0.35;
+        heroLayer.innerHTML = `<img src="${backgrounds.hero.image}" alt="" style="opacity:${opacity};">`;
+      } else {
+        heroLayer.innerHTML = "";
+      }
+    }
+
+    // About Background
+    const aboutLayer = document.getElementById("about-bg-layer");
+    if (aboutLayer) {
+      if (backgrounds.about && backgrounds.about.image) {
+        const opacity = backgrounds.about.opacity !== undefined ? backgrounds.about.opacity : 0.20;
+        aboutLayer.innerHTML = `<img src="${backgrounds.about.image}" alt="" style="opacity:${opacity};">`;
+      } else {
+        aboutLayer.innerHTML = "";
+      }
+    }
+
+    // Contact Background
+    const contactLayer = document.getElementById("contact-bg-layer");
+    if (contactLayer) {
+      if (backgrounds.contact && backgrounds.contact.image) {
+        const opacity = backgrounds.contact.opacity !== undefined ? backgrounds.contact.opacity : 0.30;
+        contactLayer.innerHTML = `<img src="${backgrounds.contact.image}" alt="" style="opacity:${opacity};">`;
+      } else {
+        contactLayer.innerHTML = "";
+      }
+    }
+  }
+
+  function renderNav(nav) {
+    if (!nav) return;
+    const nAbout = document.getElementById("nav-about");
+    const nServices = document.getElementById("nav-services");
+    const nProcess = document.getElementById("nav-process");
+    const nGallery = document.getElementById("nav-gallery");
+    const nVideos = document.getElementById("nav-videos");
+    const nContact = document.getElementById("nav-contact");
+    const nCta = document.getElementById("nav-cta-btn");
+
+    if (nAbout) nAbout.textContent = nav.about || "Sobre mí";
+    if (nServices) nServices.textContent = nav.services || "Servicios";
+    if (nProcess) nProcess.textContent = nav.process || "Cómo trabajamos";
+    if (nGallery) nGallery.textContent = nav.gallery || "Galería";
+    if (nVideos) nVideos.textContent = nav.videos || "Videos";
+    if (nContact) nContact.textContent = nav.contact || "Contacto";
+    if (nCta) nCta.textContent = nav.ctaBtn || "Reservar";
+  }
+
   function renderRibbon(ribbon) {
     const bar1 = document.getElementById("ribbon");
     const bar2 = document.getElementById("ribbon-footer");
@@ -92,7 +165,7 @@
     if (heading) heading.textContent = hero.heading || "";
     if (subhead) subhead.textContent = hero.subheading || "";
     if (cta1) cta1.textContent = hero.ctaPrimary || "Reservar";
-    if (cta2) cta2.textContent = hero.ctaSecondary || "Ver más";
+    if (cta2) cta2.textContent = hero.ctaSecondary || "Ver servicios";
     if (hero.image) {
       const box = document.getElementById("hero-visual");
       if (box) box.innerHTML = `<img src="${hero.image}" alt="">`;
@@ -103,15 +176,26 @@
     if (!about) return;
     const heading = document.getElementById("about-heading");
     const text = document.getElementById("about-text");
+    const badgeText = document.getElementById("about-badge-text");
+    const badgeWrap = document.getElementById("about-badge-wrap");
+
     if (heading) heading.textContent = about.heading || "Sobre mí";
     if (text) text.textContent = about.text || "";
+    if (badgeText) badgeText.textContent = about.badge || "";
+    if (badgeWrap) badgeWrap.style.display = about.badge ? "inline-flex" : "none";
+
     if (about.image) {
       const box = document.getElementById("about-photo");
       if (box) box.innerHTML = `<img src="${about.image}" alt="">`;
     }
   }
 
-  function renderServices(services) {
+  function renderServices(servicesSection, services) {
+    const heading = document.getElementById("services-heading");
+    const lede = document.getElementById("services-lede");
+    if (heading && servicesSection) heading.textContent = servicesSection.heading || "Servicios";
+    if (lede && servicesSection) lede.textContent = servicesSection.lede || "";
+
     const row = document.getElementById("services-row");
     if (!row) return;
     row.innerHTML = (services || []).map(s => `
@@ -122,7 +206,12 @@
     `).join("");
   }
 
-  function renderProcess(process) {
+  function renderProcess(processSection, process) {
+    const heading = document.getElementById("process-heading");
+    const lede = document.getElementById("process-lede");
+    if (heading && processSection) heading.textContent = processSection.heading || "Cómo trabajamos";
+    if (lede && processSection) lede.textContent = processSection.lede || "";
+
     const row = document.getElementById("process-row");
     if (!row) return;
     row.innerHTML = (process || []).map((p, i) => `
@@ -134,7 +223,12 @@
     `).join("");
   }
 
-  function renderVideos(videos) {
+  function renderVideosSection(videosSection, videos) {
+    const heading = document.getElementById("videos-heading");
+    const lede = document.getElementById("videos-lede");
+    if (heading && videosSection) heading.textContent = videosSection.heading || "Videos";
+    if (lede && videosSection) lede.textContent = videosSection.lede || "";
+
     const grid = document.getElementById("video-grid");
     if (!grid) return;
     const list = (videos || []).filter(v => v.url);
@@ -149,7 +243,6 @@
       </div>
     `).join("");
 
-    // Registrar interacción al hacer clic en contenedor de video
     grid.querySelectorAll(".video-card").forEach((card, idx) => {
       card.addEventListener("click", () => {
         if (list[idx]) trackMedia("video", list[idx].url, list[idx].caption);
@@ -175,7 +268,12 @@
     return url;
   }
 
-  function renderGalleryAndFilmstrip(gallery) {
+  function renderGalleryAndFilmstrip(gallerySection, gallery) {
+    const heading = document.getElementById("gallery-heading");
+    const lede = document.getElementById("gallery-lede");
+    if (heading && gallerySection) heading.textContent = gallerySection.heading || "Galería";
+    if (lede && gallerySection) lede.textContent = gallerySection.lede || "";
+
     const viewer = document.getElementById("gallery-viewer");
     const filmstrip = document.getElementById("filmstrip");
     if (!viewer || !filmstrip) return;
@@ -188,7 +286,6 @@
       return;
     }
 
-    // Registrar la visualización de la primera foto activa
     trackMedia("photo", photos[0].url, photos[0].caption);
 
     viewer.innerHTML =
@@ -212,7 +309,6 @@
         const captionElem = document.getElementById("gallery-caption");
         if (captionElem) captionElem.textContent = photos[i].caption || "";
 
-        // Registrar analítica de la foto seleccionada
         trackMedia("photo", photos[i].url, photos[i].caption);
 
         const galSec = document.getElementById("gallery");
@@ -225,8 +321,17 @@
     if (!contact) return;
     const heading = document.getElementById("contact-heading");
     const text = document.getElementById("contact-text");
+    const labelName = document.getElementById("label-f-name");
+    const labelEmail = document.getElementById("label-f-email");
+    const labelMsg = document.getElementById("label-f-msg");
+    const btnSubmit = document.getElementById("btn-f-submit");
+
     if (heading) heading.textContent = contact.heading || "Empecemos";
     if (text) text.textContent = contact.text || "";
+    if (labelName) labelName.textContent = contact.nameLabel || "Nombre";
+    if (labelEmail) labelEmail.textContent = contact.emailLabel || "Email";
+    if (labelMsg) labelMsg.textContent = contact.msgLabel || "Contame tu objetivo";
+    if (btnSubmit) btnSubmit.textContent = contact.btnText || "Enviar";
 
     const whatsappNum = (social && social.whatsapp) || contact.whatsapp || "";
     const instagramUrl = (social && social.instagram) || contact.instagram || "";
@@ -239,11 +344,9 @@
       links.innerHTML = html;
     }
 
-    // Renderizar iconos de redes sociales en el footer
     const footerSocial = document.getElementById("footer-social");
     if (footerSocial) {
       const socialList = [];
-
       if (instagramUrl) {
         socialList.push({ name: "Instagram", url: instagramUrl, svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>` });
       }
@@ -271,8 +374,25 @@
       `).join("");
     }
 
-    // Renderizar Burbuja Flotante de WhatsApp
     renderWhatsAppBubble(whatsappNum, social);
+  }
+
+  function renderFooter(brand, footer) {
+    const parts = (brand || "Britov.Coach").split(".");
+    const logo = document.getElementById("brand-logo");
+    const fb1 = document.getElementById("footer-brand-1");
+    const fb2 = document.getElementById("footer-brand-2");
+    const fdesc = document.getElementById("footer-brand-desc");
+    const flabel = document.getElementById("footer-filmstrip-label");
+    const fcopy = document.getElementById("footer-copy");
+
+    if (logo) logo.innerHTML = parts[0] + (parts[1] ? `<span>.${parts[1]}</span>` : "");
+    if (fb1) fb1.textContent = parts[0];
+    if (fb2) fb2.textContent = parts[1] ? "." + parts[1] : "";
+
+    if (fdesc && footer) fdesc.textContent = footer.brandDesc || "";
+    if (flabel && footer) flabel.textContent = footer.filmstripLabel || "Galería — elegí una foto para verla arriba";
+    if (fcopy && footer) fcopy.textContent = footer.copyright || `© ${new Date().getFullYear()} ${brand}. Todos los derechos reservados.`;
   }
 
   function renderWhatsAppBubble(whatsappNum, social) {
@@ -300,19 +420,6 @@
     `;
   }
 
-  function renderBrand(brand) {
-    const parts = (brand || "Britov.Coach").split(".");
-    const logo = document.getElementById("brand-logo");
-    const fb1 = document.getElementById("footer-brand-1");
-    const fb2 = document.getElementById("footer-brand-2");
-    const fcopy = document.getElementById("footer-copy");
-
-    if (logo) logo.innerHTML = parts[0] + (parts[1] ? `<span>.${parts[1]}</span>` : "");
-    if (fb1) fb1.textContent = parts[0];
-    if (fb2) fb2.textContent = parts[1] ? "." + parts[1] : "";
-    if (fcopy) fcopy.textContent = `© ${new Date().getFullYear()} ${brand}. Todos los derechos reservados.`;
-  }
-
   function escapeHtml(str) {
     return String(str || "").replace(/[&<>"']/g, m => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -338,15 +445,17 @@
     trackVisit();
     content = await loadContent();
     applyColors(content.colors);
-    renderBrand(content.brand);
+    renderBackgrounds(content.backgrounds);
+    renderNav(content.nav);
     renderRibbon(content.ribbon);
     renderHero(content.hero);
     renderAbout(content.about);
-    renderServices(content.services);
-    renderProcess(content.process);
-    renderGalleryAndFilmstrip(content.gallery);
-    renderVideos(content.videos);
+    renderServices(content.servicesSection, content.services);
+    renderProcess(content.processSection, content.process);
+    renderGalleryAndFilmstrip(content.gallerySection, content.gallery);
+    renderVideosSection(content.videosSection, content.videos);
     renderContactAndSocial(content.contact, content.social);
+    renderFooter(content.brand, content.footer);
   }
 
   document.addEventListener("DOMContentLoaded", init);

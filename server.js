@@ -76,7 +76,7 @@ db.exec(`
 const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get().count;
 if (userCount === 0) {
   const defaultAdminEmail = "admin@britov.coach";
-  const defaultPassword = "admin"; // Se recomienda cambiar desde el admin
+  const defaultPassword = "admin";
   const hash = bcrypt.hashSync(defaultPassword, 10);
   db.prepare("INSERT INTO users (email, password_hash) VALUES (?, ?)").run(defaultAdminEmail, hash);
   console.log(`[SQLite] Usuario admin creado por defecto: ${defaultAdminEmail} / contraseña: ${defaultPassword}`);
@@ -84,10 +84,12 @@ if (userCount === 0) {
 
 const DEFAULT_CONTENT = {
   brand: "Britov.Coach",
+
   ribbon: {
     active: true,
     text: "Primera sesión de evaluación sin cargo — cupos limitados este mes"
   },
+
   colors: {
     black: "#0b0a0f",
     charcoal: "#17151d",
@@ -96,55 +98,99 @@ const DEFAULT_CONTENT = {
     violetBright: "#8b5cf6",
     gray: "#a8a3b3"
   },
+
+  backgrounds: {
+    hero: { image: "", opacity: 0.35 },
+    about: { image: "", opacity: 0.20 },
+    contact: { image: "", opacity: 0.30 }
+  },
+
+  nav: {
+    about: "Sobre mí",
+    services: "Servicios",
+    process: "Cómo trabajamos",
+    gallery: "Galería",
+    videos: "Videos",
+    contact: "Contacto",
+    ctaBtn: "Reservar"
+  },
+
   hero: {
     kicker: "Entrenamiento personal en Barcelona",
     heading: "Tu cuerpo cambia cuando cambia tu plan, no tu fuerza de voluntad",
-    subheading:
-      "Entrenamiento personalizado y grupal con seguimiento real: evaluación inicial, plan a medida y ajustes semana a semana.",
+    subheading: "Entrenamiento personalizado y grupal con seguimiento real: evaluación inicial, plan a medida y ajustes semana a semana.",
     ctaPrimary: "Reservar evaluación",
     ctaSecondary: "Ver servicios",
     image: ""
   },
+
   about: {
     heading: "Sobre mí",
-    text:
-      "Soy entrenadora personal certificada (Personal Training y Group Fitness, ORTHOS Barcelona). Trabajo con personas que quieren un plan claro, sostenible y adaptado a su rutina real — no una tabla genérica de internet. Cada plan se revisa y se ajusta con el progreso.",
+    text: "Soy entrenadora personal certificada (Personal Training y Group Fitness, ORTHOS Barcelona). Trabajo con personas que quieren un plan claro, sostenible y adaptado a su rutina real — no una tabla genérica de internet. Cada plan se revisa y se ajusta con el progreso.",
+    badge: "Certificación Personal Training & Group Fitness — ORTHOS Barcelona",
     image: ""
   },
+
+  servicesSection: {
+    heading: "Servicios",
+    lede: "Tres formas de entrenar, un solo criterio: plan claro y seguimiento constante."
+  },
+
   services: [
-    {
-      title: "Entrenamiento 1:1",
-      text: "Sesiones individuales presenciales, plan de progresión y técnica corregida en vivo."
-    },
-    {
-      title: "Entrenamiento grupal",
-      text: "Grupos reducidos, misma exigencia técnica, precio más accesible y buena energía."
-    },
-    {
-      title: "Plan online",
-      text: "Rutina y seguimiento a distancia con revisión semanal, para quien entrena por su cuenta."
-    }
+    { title: "Entrenamiento 1:1", text: "Sesiones individuales presenciales, plan de progresión y técnica corregida en vivo." },
+    { title: "Entrenamiento grupal", text: "Grupos reducidos, misma exigencia técnica, precio más accesible y buena energía." },
+    { title: "Plan online", text: "Rutina y seguimiento a distancia con revisión semanal, para quien entrena por su cuenta." }
   ],
+
+  processSection: {
+    heading: "Cómo trabajamos",
+    lede: "Nuestro método paso a paso para lograr resultados reales."
+  },
+
   process: [
     { title: "Evaluación inicial", text: "Objetivo, historial, movilidad y disponibilidad real." },
     { title: "Plan a medida", text: "Progresión concreta: qué, cuánto y por qué en cada fase." },
     { title: "Seguimiento y ajuste", text: "Revisión periódica del plan según cómo responde tu cuerpo." }
   ],
+
+  gallerySection: {
+    heading: "Galería",
+    lede: "Elegí una foto desde la cinta al final de la página para verla en grande acá."
+  },
+
+  videosSection: {
+    heading: "Videos",
+    lede: "Mira nuestros entrenamientos en acción."
+  },
+
   gallery: [
     { url: "", caption: "Foto 1 — reemplazá desde el panel admin" },
     { url: "", caption: "Foto 2 — reemplazá desde el panel admin" },
     { url: "", caption: "Foto 3 — reemplazá desde el panel admin" },
     { url: "", caption: "Foto 4 — reemplazá desde el panel admin" }
   ],
+
   videos: [
     { url: "", caption: "Video 1 — agregá un link de YouTube o Vimeo desde el admin" }
   ],
+
   contact: {
     heading: "Empecemos",
     text: "Contame tu objetivo y disponibilidad, te respondo en menos de 24 horas.",
+    nameLabel: "Nombre",
+    emailLabel: "Email",
+    msgLabel: "Contame tu objetivo",
+    btnText: "Enviar",
     whatsapp: "",
     instagram: ""
   },
+
+  footer: {
+    brandDesc: "Entrenamiento personal y grupal en Barcelona, con seguimiento real de cada plan.",
+    filmstripLabel: "Galería — elegí una foto para verla arriba",
+    copyright: "© 2026 Britov.Coach. Todos los derechos reservados."
+  },
+
   social: {
     whatsapp: "",
     instagram: "",
@@ -179,6 +225,26 @@ function verifyToken(req) {
   return activeTokens.has(token);
 }
 
+// Deep merge helper para fusionar objetos complejos sin sobrescribir llaves faltantes
+function deepMerge(target, source) {
+  const output = Object.assign({}, target);
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) Object.assign(output, { [key]: source[key] });
+        else output[key] = deepMerge(target[key], source[key]);
+      } else {
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+  }
+  return output;
+}
+
+function isObject(item) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
@@ -198,9 +264,8 @@ app.get("/api/config", (req, res) => {
       return res.status(404).json({ error: "Configuración no encontrada" });
     }
     const data = JSON.parse(row.content);
-    // Asegurar estructura social por defecto si es una BD existente
-    if (!data.social) data.social = DEFAULT_CONTENT.social;
-    res.json(data);
+    const merged = deepMerge(DEFAULT_CONTENT, data);
+    res.json(merged);
   } catch (err) {
     console.error("Error leyendo SQLite:", err);
     res.status(500).json({ error: "Error al leer la base de datos SQLite" });
@@ -251,7 +316,7 @@ app.post("/api/config", (req, res) => {
   }
 });
 
-// 5. Endpoint para subir archivos de fotos desde la computadora (Requiere Auth)
+// 5. Endpoint para subir archivos de fotos (Requiere Auth)
 app.post("/api/upload", (req, res) => {
   if (!verifyToken(req)) {
     return res.status(401).json({ error: "No autorizado. Inicie sesión nuevamente." });
@@ -292,8 +357,6 @@ app.post("/api/change-password", (req, res) => {
 });
 
 // --- ANALYTICS & METRICS ENDPOINTS ---
-
-// Registrar visita a la web (Público)
 app.post("/api/analytics/track-visit", (req, res) => {
   try {
     const page = req.body.page || "home";
@@ -305,7 +368,6 @@ app.post("/api/analytics/track-visit", (req, res) => {
   }
 });
 
-// Registrar interacción con fotos o videos (Público)
 app.post("/api/analytics/track-media", (req, res) => {
   try {
     const { media_type, media_url, media_caption } = req.body;
@@ -321,7 +383,6 @@ app.post("/api/analytics/track-media", (req, res) => {
   }
 });
 
-// Obtener métricas consolidadas (Dashboard Admin - Requiere Auth)
 app.get("/api/analytics/stats", (req, res) => {
   if (!verifyToken(req)) {
     return res.status(401).json({ error: "No autorizado." });

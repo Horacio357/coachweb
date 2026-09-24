@@ -1,5 +1,5 @@
 /* =========================================================
-   BRITOV.COACH — PANEL ADMIN (SQLITE BACKEND & DASHBOARD)
+   BRITOV.COACH — PANEL ADMIN COMPLETO (SQLITE & ANALYTICS)
    ========================================================= */
 (function () {
   "use strict";
@@ -18,13 +18,24 @@
     logoutBtn: document.getElementById("logout-btn"),
     saveBtn: document.getElementById("save-btn"),
     saveStatus: document.getElementById("save-status"),
+    
+    // Listas dinámicas
     photoList: document.getElementById("photo-list"),
     videoList: document.getElementById("video-list"),
+    servicesList: document.getElementById("services-list"),
+    processList: document.getElementById("process-list"),
+    
+    // Botones de agregar
     addPhoto: document.getElementById("add-photo"),
     addVideo: document.getElementById("add-video"),
+    addService: document.getElementById("add-service"),
+    addProcessStep: document.getElementById("add-process-step"),
+
+    // Seguridad
     changePassForm: document.getElementById("change-pass-form"),
     newPassInput: document.getElementById("new-pass"),
     passMsg: document.getElementById("pass-msg"),
+
     // Dashboard elements
     statTotalVisits: document.getElementById("stat-total-visits"),
     statTodayVisits: document.getElementById("stat-today-visits"),
@@ -34,10 +45,27 @@
     topVideosList: document.getElementById("top-videos-list"),
   };
 
+  function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+  }
+
+  function deepMerge(target, source) {
+    const output = Object.assign({}, target);
+    if (isObject(target) && isObject(source)) {
+      Object.keys(source).forEach(key => {
+        if (isObject(source[key])) {
+          if (!(key in target)) Object.assign(output, { [key]: source[key] });
+          else output[key] = deepMerge(target[key], source[key]);
+        } else {
+          Object.assign(output, { [key]: source[key] });
+        }
+      });
+    }
+    return output;
+  }
+
   function mergeWithDefaults(data) {
-    const merged = Object.assign({}, DEFAULT_CONTENT, data || {});
-    merged.social = Object.assign({}, DEFAULT_CONTENT.social, (data && data.social) || {});
-    return JSON.parse(JSON.stringify(merged));
+    return JSON.parse(JSON.stringify(deepMerge(DEFAULT_CONTENT, data || {})));
   }
 
   /* ---------------- boot ---------------- */
@@ -77,6 +105,8 @@
     await loadContent();
     await loadAnalytics();
     populateForm();
+    setupOpacitySliders();
+    setupFileUploads();
   }
 
   /* ---------------- analytics ---------------- */
@@ -100,7 +130,6 @@
     if (els.statWeekVisits) els.statWeekVisits.textContent = stats.visitsThisWeek || 0;
     if (els.statPhotoCount) els.statPhotoCount.textContent = (currentContent.gallery || []).length;
 
-    // Fotos más vistas
     if (els.topPhotosList) {
       if (stats.topPhotos && stats.topPhotos.length > 0) {
         els.topPhotosList.innerHTML = stats.topPhotos.map(item => `
@@ -117,7 +146,6 @@
       }
     }
 
-    // Videos más vistos
     if (els.topVideosList) {
       if (stats.topVideos && stats.topVideos.length > 0) {
         els.topVideosList.innerHTML = stats.topVideos.map(item => `
@@ -168,7 +196,6 @@
     showLogin();
   });
 
-  // Cambiar contraseña
   els.changePassForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     els.passMsg.textContent = "Actualizando...";
@@ -214,38 +241,166 @@
     currentContent = mergeWithDefaults(null);
   }
 
+  function setupOpacitySliders() {
+    const sliders = [
+      { slider: "bg-hero-opacity", val: "bg-hero-opacity-val" },
+      { slider: "bg-about-opacity", val: "bg-about-opacity-val" },
+      { slider: "bg-contact-opacity", val: "bg-contact-opacity-val" }
+    ];
+
+    sliders.forEach(item => {
+      const sliderElem = document.getElementById(item.slider);
+      const valElem = document.getElementById(item.val);
+      if (sliderElem && valElem) {
+        sliderElem.addEventListener("input", (e) => {
+          valElem.textContent = e.target.value + "%";
+        });
+      }
+    });
+  }
+
+  function setupFileUploads() {
+    const bindUpload = (fileInputId, textInputId) => {
+      const fileInput = document.getElementById(fileInputId);
+      const textInput = document.getElementById(textInputId);
+      if (!fileInput || !textInput) return;
+
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("photo", file);
+        textInput.value = "Subiendo...";
+
+        try {
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            textInput.value = data.url;
+          } else {
+            alert("Error al subir imagen: " + (data.error || "Desconocido"));
+            textInput.value = "";
+          }
+        } catch (err) {
+          alert("Error de conexión al subir la imagen.");
+          textInput.value = "";
+        }
+      });
+    };
+
+    bindUpload("file-bg-hero", "bg-hero-img");
+    bindUpload("file-bg-about", "bg-about-img");
+    bindUpload("file-bg-contact", "bg-contact-img");
+    bindUpload("file-hero-img", "t-hero-img");
+    bindUpload("file-about-img", "t-about-img");
+  }
+
   function populateForm() {
-    document.getElementById("ribbon-active").checked = !!currentContent.ribbon.active;
-    document.getElementById("ribbon-text").value = currentContent.ribbon.text || "";
+    const c = currentContent;
 
-    document.getElementById("c-black").value = currentContent.colors.black || "#0b0a0f";
-    document.getElementById("c-charcoal").value = currentContent.colors.charcoal || "#17151d";
-    document.getElementById("c-violetDeep").value = currentContent.colors.violetDeep || "#2c1a4d";
-    document.getElementById("c-violet").value = currentContent.colors.violet || "#5b3aa0";
-    document.getElementById("c-violetBright").value = currentContent.colors.violetBright || "#8b5cf6";
-    document.getElementById("c-gray").value = currentContent.colors.gray || "#a8a3b3";
+    // Cinta y Colores
+    document.getElementById("ribbon-active").checked = !!c.ribbon.active;
+    document.getElementById("ribbon-text").value = c.ribbon.text || "";
 
-    document.getElementById("t-brand").value = currentContent.brand || "";
-    document.getElementById("t-hero-kicker").value = currentContent.hero.kicker || "";
-    document.getElementById("t-hero-heading").value = currentContent.hero.heading || "";
-    document.getElementById("t-hero-sub").value = currentContent.hero.subheading || "";
-    document.getElementById("t-wsp").value = currentContent.contact.whatsapp || "";
-    document.getElementById("t-ig").value = currentContent.contact.instagram || "";
+    document.getElementById("c-black").value = c.colors.black || "#0b0a0f";
+    document.getElementById("c-charcoal").value = c.colors.charcoal || "#17151d";
+    document.getElementById("c-violetDeep").value = c.colors.violetDeep || "#2c1a4d";
+    document.getElementById("c-violet").value = c.colors.violet || "#5b3aa0";
+    document.getElementById("c-violetBright").value = c.colors.violetBright || "#8b5cf6";
+    document.getElementById("c-gray").value = c.colors.gray || "#a8a3b3";
 
-    // Poblar Redes Sociales y Burbuja de WhatsApp
-    const soc = currentContent.social || {};
+    // Fondos y Opacidad
+    const bg = c.backgrounds || {};
+    document.getElementById("bg-hero-img").value = (bg.hero && bg.hero.image) || "";
+    document.getElementById("bg-hero-opacity").value = Math.round(((bg.hero && bg.hero.opacity !== undefined) ? bg.hero.opacity : 0.35) * 100);
+    document.getElementById("bg-hero-opacity-val").textContent = Math.round(((bg.hero && bg.hero.opacity !== undefined) ? bg.hero.opacity : 0.35) * 100) + "%";
+
+    document.getElementById("bg-about-img").value = (bg.about && bg.about.image) || "";
+    document.getElementById("bg-about-opacity").value = Math.round(((bg.about && bg.about.opacity !== undefined) ? bg.about.opacity : 0.20) * 100);
+    document.getElementById("bg-about-opacity-val").textContent = Math.round(((bg.about && bg.about.opacity !== undefined) ? bg.about.opacity : 0.20) * 100) + "%";
+
+    document.getElementById("bg-contact-img").value = (bg.contact && bg.contact.image) || "";
+    document.getElementById("bg-contact-opacity").value = Math.round(((bg.contact && bg.contact.opacity !== undefined) ? bg.contact.opacity : 0.30) * 100);
+    document.getElementById("bg-contact-opacity-val").textContent = Math.round(((bg.contact && bg.contact.opacity !== undefined) ? bg.contact.opacity : 0.30) * 100) + "%";
+
+    // Menú Navegación
+    const nav = c.nav || {};
+    document.getElementById("n-about").value = nav.about || "Sobre mí";
+    document.getElementById("n-services").value = nav.services || "Servicios";
+    document.getElementById("n-process").value = nav.process || "Cómo trabajamos";
+    document.getElementById("n-gallery").value = nav.gallery || "Galería";
+    document.getElementById("n-videos").value = nav.videos || "Videos";
+    document.getElementById("n-contact").value = nav.contact || "Contacto";
+    document.getElementById("n-cta").value = nav.ctaBtn || "Reservar";
+
+    // Portada Hero
+    document.getElementById("t-brand").value = c.brand || "";
+    document.getElementById("t-hero-kicker").value = c.hero.kicker || "";
+    document.getElementById("t-hero-heading").value = c.hero.heading || "";
+    document.getElementById("t-hero-sub").value = c.hero.subheading || "";
+    document.getElementById("t-hero-cta1").value = c.hero.ctaPrimary || "";
+    document.getElementById("t-hero-cta2").value = c.hero.ctaSecondary || "";
+    document.getElementById("t-hero-img").value = c.hero.image || "";
+
+    // Sobre Mí
+    document.getElementById("t-about-heading").value = c.about.heading || "";
+    document.getElementById("t-about-text").value = c.about.text || "";
+    document.getElementById("t-about-badge").value = c.about.badge || "";
+    document.getElementById("t-about-img").value = c.about.image || "";
+
+    // Secciones Encabezados
+    const ss = c.servicesSection || {};
+    document.getElementById("t-services-heading").value = ss.heading || "";
+    document.getElementById("t-services-lede").value = ss.lede || "";
+
+    const ps = c.processSection || {};
+    document.getElementById("t-process-heading").value = ps.heading || "";
+    document.getElementById("t-process-lede").value = ps.lede || "";
+
+    const gs = c.gallerySection || {};
+    document.getElementById("t-gallery-heading").value = gs.heading || "";
+    document.getElementById("t-gallery-lede").value = gs.lede || "";
+
+    const vs = c.videosSection || {};
+    document.getElementById("t-videos-heading").value = vs.heading || "";
+    document.getElementById("t-videos-lede").value = vs.lede || "";
+
+    // Contacto (Textos)
+    document.getElementById("t-contact-heading").value = c.contact.heading || "";
+    document.getElementById("t-contact-text").value = c.contact.text || "";
+    document.getElementById("t-contact-name-label").value = c.contact.nameLabel || "Nombre";
+    document.getElementById("t-contact-email-label").value = c.contact.emailLabel || "Email";
+    document.getElementById("t-contact-msg-label").value = c.contact.msgLabel || "Contame tu objetivo";
+    document.getElementById("t-contact-btn-text").value = c.contact.btnText || "Enviar";
+
+    // Footer
+    const ft = c.footer || {};
+    document.getElementById("t-footer-desc").value = ft.brandDesc || "";
+    document.getElementById("t-footer-filmstrip-label").value = ft.filmstripLabel || "";
+    document.getElementById("t-footer-copy").value = ft.copyright || "";
+
+    // Redes Sociales y Burbuja
+    const soc = c.social || {};
     document.getElementById("wa-bubble-active").checked = (soc.whatsappBubbleActive !== false);
     document.getElementById("wa-default-msg").value = soc.whatsappDefaultMsg || "¡Hola! Quisiera más información sobre los entrenamientos.";
 
-    document.getElementById("s-wsp").value = soc.whatsapp || currentContent.contact.whatsapp || "";
-    document.getElementById("s-ig").value = soc.instagram || currentContent.contact.instagram || "";
+    document.getElementById("s-wsp").value = soc.whatsapp || c.contact.whatsapp || "";
+    document.getElementById("s-ig").value = soc.instagram || c.contact.instagram || "";
     document.getElementById("s-fb").value = soc.facebook || "";
     document.getElementById("s-tt").value = soc.tiktok || "";
     document.getElementById("s-yt").value = soc.youtube || "";
     document.getElementById("s-li").value = soc.linkedin || "";
 
+    // Renderizado listas dinámicas
     renderPhotoList();
     renderVideoList();
+    renderServicesList();
+    renderProcessList();
   }
 
   /* ---------------- listas dinámicas ---------------- */
@@ -293,7 +448,6 @@
 
       const formData = new FormData();
       formData.append("photo", file);
-
       urlInput.value = "Subiendo...";
 
       try {
@@ -353,6 +507,61 @@
     return row;
   }
 
+  function renderServicesList() {
+    els.servicesList.innerHTML = "";
+    (currentContent.services || []).forEach((item, i) => els.servicesList.appendChild(serviceRow(item, i)));
+  }
+
+  function serviceRow(item, i) {
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.style.gridTemplateColumns = "1fr 2fr auto";
+    row.innerHTML = `
+      <input type="text" data-field="title" placeholder="Título del Servicio" value="${escapeAttr(item.title)}">
+      <input type="text" data-field="text" placeholder="Descripción del servicio" value="${escapeAttr(item.text)}">
+      <button type="button" class="remove">Quitar</button>
+    `;
+    row.querySelector('[data-field="title"]').addEventListener("input", (e) => {
+      currentContent.services[i].title = e.target.value;
+    });
+    row.querySelector('[data-field="text"]').addEventListener("input", (e) => {
+      currentContent.services[i].text = e.target.value;
+    });
+    row.querySelector(".remove").addEventListener("click", () => {
+      currentContent.services.splice(i, 1);
+      renderServicesList();
+    });
+    return row;
+  }
+
+  function renderProcessList() {
+    els.processList.innerHTML = "";
+    (currentContent.process || []).forEach((item, i) => els.processList.appendChild(processRow(item, i)));
+  }
+
+  function processRow(item, i) {
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.style.gridTemplateColumns = "1fr 2fr auto";
+    row.innerHTML = `
+      <input type="text" data-field="title" placeholder="Título del Paso" value="${escapeAttr(item.title)}">
+      <input type="text" data-field="text" placeholder="Descripción del paso" value="${escapeAttr(item.text)}">
+      <button type="button" class="remove">Quitar</button>
+    `;
+    row.querySelector('[data-field="title"]').addEventListener("input", (e) => {
+      currentContent.process[i].title = e.target.value;
+    });
+    row.querySelector('[data-field="text"]').addEventListener("input", (e) => {
+      currentContent.process[i].text = e.target.value;
+    });
+    row.querySelector(".remove").addEventListener("click", () => {
+      currentContent.process.splice(i, 1);
+      renderProcessList();
+    });
+    return row;
+  }
+
+  // Eventos para botones de agregar
   els.addPhoto.addEventListener("click", () => {
     currentContent.gallery.push({ url: "", caption: "" });
     renderPhotoList();
@@ -361,6 +570,18 @@
   els.addVideo.addEventListener("click", () => {
     currentContent.videos.push({ url: "", caption: "" });
     renderVideoList();
+  });
+
+  els.addService.addEventListener("click", () => {
+    currentContent.services = currentContent.services || [];
+    currentContent.services.push({ title: "", text: "" });
+    renderServicesList();
+  });
+
+  els.addProcessStep.addEventListener("click", () => {
+    currentContent.process = currentContent.process || [];
+    currentContent.process.push({ title: "", text: "" });
+    renderProcessList();
   });
 
   function escapeAttr(str) {
@@ -390,9 +611,9 @@
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        els.saveStatus.textContent = "✅ Guardado exitosamente en la base de datos SQLite.";
+        els.saveStatus.textContent = "✅ Cambios guardados exitosamente en la base de datos SQLite.";
         els.saveStatus.style.color = "#9ee6b8";
-        await loadAnalytics(); // Recargar analíticas tras guardar
+        await loadAnalytics();
       } else {
         els.saveStatus.textContent = "❌ Error: " + (data.error || "No se pudo guardar.");
         els.saveStatus.style.color = "#e0607a";
@@ -407,38 +628,103 @@
   });
 
   function collectFormIntoContent() {
-    currentContent.ribbon.active = document.getElementById("ribbon-active").checked;
-    currentContent.ribbon.text = document.getElementById("ribbon-text").value.trim();
+    const c = currentContent;
 
-    currentContent.colors.black = document.getElementById("c-black").value;
-    currentContent.colors.charcoal = document.getElementById("c-charcoal").value;
-    currentContent.colors.violetDeep = document.getElementById("c-violetDeep").value;
-    currentContent.colors.violet = document.getElementById("c-violet").value;
-    currentContent.colors.violetBright = document.getElementById("c-violetBright").value;
-    currentContent.colors.gray = document.getElementById("c-gray").value;
+    // Cinta y Colores
+    c.ribbon.active = document.getElementById("ribbon-active").checked;
+    c.ribbon.text = document.getElementById("ribbon-text").value.trim();
 
-    currentContent.brand = document.getElementById("t-brand").value.trim();
-    currentContent.hero.kicker = document.getElementById("t-hero-kicker").value.trim();
-    currentContent.hero.heading = document.getElementById("t-hero-heading").value.trim();
-    currentContent.hero.subheading = document.getElementById("t-hero-sub").value.trim();
-    currentContent.contact.whatsapp = document.getElementById("t-wsp").value.trim();
-    currentContent.contact.instagram = document.getElementById("t-ig").value.trim();
+    c.colors.black = document.getElementById("c-black").value;
+    c.colors.charcoal = document.getElementById("c-charcoal").value;
+    c.colors.violetDeep = document.getElementById("c-violetDeep").value;
+    c.colors.violet = document.getElementById("c-violet").value;
+    c.colors.violetBright = document.getElementById("c-violetBright").value;
+    c.colors.gray = document.getElementById("c-gray").value;
 
-    // Recolectar datos sociales y de la burbuja
-    currentContent.social = currentContent.social || {};
-    currentContent.social.whatsappBubbleActive = document.getElementById("wa-bubble-active").checked;
-    currentContent.social.whatsappDefaultMsg = document.getElementById("wa-default-msg").value.trim();
+    // Fondos y Opacidad
+    c.backgrounds = c.backgrounds || {};
+    c.backgrounds.hero = {
+      image: document.getElementById("bg-hero-img").value.trim(),
+      opacity: parseFloat(document.getElementById("bg-hero-opacity").value) / 100
+    };
+    c.backgrounds.about = {
+      image: document.getElementById("bg-about-img").value.trim(),
+      opacity: parseFloat(document.getElementById("bg-about-opacity").value) / 100
+    };
+    c.backgrounds.contact = {
+      image: document.getElementById("bg-contact-img").value.trim(),
+      opacity: parseFloat(document.getElementById("bg-contact-opacity").value) / 100
+    };
 
-    currentContent.social.whatsapp = document.getElementById("s-wsp").value.trim();
-    currentContent.social.instagram = document.getElementById("s-ig").value.trim();
-    currentContent.social.facebook = document.getElementById("s-fb").value.trim();
-    currentContent.social.tiktok = document.getElementById("s-tt").value.trim();
-    currentContent.social.youtube = document.getElementById("s-yt").value.trim();
-    currentContent.social.linkedin = document.getElementById("s-li").value.trim();
+    // Menú Navegación
+    c.nav = c.nav || {};
+    c.nav.about = document.getElementById("n-about").value.trim();
+    c.nav.services = document.getElementById("n-services").value.trim();
+    c.nav.process = document.getElementById("n-process").value.trim();
+    c.nav.gallery = document.getElementById("n-gallery").value.trim();
+    c.nav.videos = document.getElementById("n-videos").value.trim();
+    c.nav.contact = document.getElementById("n-contact").value.trim();
+    c.nav.ctaBtn = document.getElementById("n-cta").value.trim();
 
-    // Sincronizar whatsapp / instagram principal en contact
-    if (currentContent.social.whatsapp) currentContent.contact.whatsapp = currentContent.social.whatsapp;
-    if (currentContent.social.instagram) currentContent.contact.instagram = currentContent.social.instagram;
+    // Portada (Hero)
+    c.brand = document.getElementById("t-brand").value.trim();
+    c.hero.kicker = document.getElementById("t-hero-kicker").value.trim();
+    c.hero.heading = document.getElementById("t-hero-heading").value.trim();
+    c.hero.subheading = document.getElementById("t-hero-sub").value.trim();
+    c.hero.ctaPrimary = document.getElementById("t-hero-cta1").value.trim();
+    c.hero.ctaSecondary = document.getElementById("t-hero-cta2").value.trim();
+    c.hero.image = document.getElementById("t-hero-img").value.trim();
+
+    // Sobre Mí
+    c.about.heading = document.getElementById("t-about-heading").value.trim();
+    c.about.text = document.getElementById("t-about-text").value.trim();
+    c.about.badge = document.getElementById("t-about-badge").value.trim();
+    c.about.image = document.getElementById("t-about-img").value.trim();
+
+    // Encabezados Secciones
+    c.servicesSection = c.servicesSection || {};
+    c.servicesSection.heading = document.getElementById("t-services-heading").value.trim();
+    c.servicesSection.lede = document.getElementById("t-services-lede").value.trim();
+
+    c.processSection = c.processSection || {};
+    c.processSection.heading = document.getElementById("t-process-heading").value.trim();
+    c.processSection.lede = document.getElementById("t-process-lede").value.trim();
+
+    c.gallerySection = c.gallerySection || {};
+    c.gallerySection.heading = document.getElementById("t-gallery-heading").value.trim();
+    c.gallerySection.lede = document.getElementById("t-gallery-lede").value.trim();
+
+    c.videosSection = c.videosSection || {};
+    c.videosSection.heading = document.getElementById("t-videos-heading").value.trim();
+    c.videosSection.lede = document.getElementById("t-videos-lede").value.trim();
+
+    // Contacto (Textos)
+    c.contact.heading = document.getElementById("t-contact-heading").value.trim();
+    c.contact.text = document.getElementById("t-contact-text").value.trim();
+    c.contact.nameLabel = document.getElementById("t-contact-name-label").value.trim();
+    c.contact.emailLabel = document.getElementById("t-contact-email-label").value.trim();
+    c.contact.msgLabel = document.getElementById("t-contact-msg-label").value.trim();
+    c.contact.btnText = document.getElementById("t-contact-btn-text").value.trim();
+
+    // Footer
+    c.footer = c.footer || {};
+    c.footer.brandDesc = document.getElementById("t-footer-desc").value.trim();
+    c.footer.filmstripLabel = document.getElementById("t-footer-filmstrip-label").value.trim();
+    c.footer.copyright = document.getElementById("t-footer-copy").value.trim();
+
+    // Redes Sociales y WhatsApp
+    c.social = c.social || {};
+    c.social.whatsappBubbleActive = document.getElementById("wa-bubble-active").checked;
+    c.social.whatsappDefaultMsg = document.getElementById("wa-default-msg").value.trim();
+    c.social.whatsapp = document.getElementById("s-wsp").value.trim();
+    c.social.instagram = document.getElementById("s-ig").value.trim();
+    c.social.facebook = document.getElementById("s-fb").value.trim();
+    c.social.tiktok = document.getElementById("s-tt").value.trim();
+    c.social.youtube = document.getElementById("s-yt").value.trim();
+    c.social.linkedin = document.getElementById("s-li").value.trim();
+
+    if (c.social.whatsapp) c.contact.whatsapp = c.social.whatsapp;
+    if (c.social.instagram) c.contact.instagram = c.social.instagram;
   }
 
   boot();
