@@ -308,6 +308,11 @@
     document.getElementById("ribbon-active").checked = !!c.ribbon.active;
     document.getElementById("ribbon-text").value = c.ribbon.text || "";
 
+    // Efectos
+    const eff = c.effects || {};
+    const srElem = document.getElementById("scroll-reveal-active");
+    if (srElem) srElem.checked = (eff.scrollRevealActive !== false);
+
     document.getElementById("c-black").value = c.colors.black || "#0b0a0f";
     document.getElementById("c-charcoal").value = c.colors.charcoal || "#17151d";
     document.getElementById("c-violetDeep").value = c.colors.violetDeep || "#2c1a4d";
@@ -766,6 +771,11 @@
     // Cinta y Colores
     c.ribbon.active = document.getElementById("ribbon-active").checked;
     c.ribbon.text = document.getElementById("ribbon-text").value.trim();
+
+    // Efectos
+    c.effects = c.effects || {};
+    const srElem = document.getElementById("scroll-reveal-active");
+    if (srElem) c.effects.scrollRevealActive = srElem.checked;
 
     c.colors.black = document.getElementById("c-black").value;
     c.colors.charcoal = document.getElementById("c-charcoal").value;

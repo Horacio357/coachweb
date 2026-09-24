@@ -540,6 +540,30 @@
     }));
   }
 
+  function setupScrollReveal(effects) {
+    const reveals = document.querySelectorAll(".reveal");
+    if (!reveals.length) return;
+
+    const isActive = !effects || effects.scrollRevealActive !== false;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!isActive || prefersReducedMotion || !("IntersectionObserver" in window)) {
+      reveals.forEach(el => el.classList.add("visible"));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    reveals.forEach(el => observer.observe(el));
+  }
+
   async function init() {
     setupMobileNav();
     trackVisit();
@@ -556,6 +580,7 @@
     renderVideosSection(content.videosSection, content.videos);
     renderContactAndSocial(content.contact, content.social);
     renderFooter(content.brand, content.footer);
+    setupScrollReveal(content.effects);
   }
 
   document.addEventListener("DOMContentLoaded", init);

@@ -101,6 +101,10 @@ const DEFAULT_CONTENT = {
     gray: "#a8a3b3"
   },
 
+  effects: {
+    scrollRevealActive: true
+  },
+
   backgrounds: {
     hero: { image: "", opacity: 0.35 },
     about: { image: "", opacity: 0.20 },
@@ -431,8 +435,8 @@ app.get("/api/analytics/stats", (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n==================================================`);
   console.log(` Britov.Coach con SQLite iniciado exitosamente!`);
-  console.log(` Sitio público: http://localhost:${PORT}`);
-  console.log(` Panel Admin:   http://localhost:${PORT}/admin`);
+  console.log(` Sitio público: http://localhost:3000`);
+  console.log(` Panel Admin:   http://localhost:3000/admin`);
   console.log(` Base SQLite:   ${dbPath}`);
   console.log(`==================================================\n`);
 });

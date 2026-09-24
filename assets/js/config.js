@@ -19,6 +19,11 @@ const DEFAULT_CONTENT = {
     gray: "#a8a3b3"
   },
 
+  // --- EFECTOS Y ANIMACIONES ---
+  effects: {
+    scrollRevealActive: true
+  },
+
   // --- FOTOS DE FONDO Y OPACIDAD ---
   backgrounds: {
     hero: { image: "", opacity: 0.35 },

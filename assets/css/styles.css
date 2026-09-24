@@ -383,3 +383,34 @@ footer.site-footer{background:var(--charcoal);border-top:1px solid rgba(247,245,
   .wa-bubble-btn svg { width: 28px; height: 28px; }
 }
 
+/* ---------- scroll reveal animations ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.services-row .card:nth-child(2),
+.process-row .process-item:nth-child(2),
+.video-grid .video-card:nth-child(2) {
+  transition-delay: 0.15s;
+}
+
+.services-row .card:nth-child(3),
+.process-row .process-item:nth-child(3),
+.video-grid .video-card:nth-child(3) {
+  transition-delay: 0.3s;
+}
+
+.services-row .card:nth-child(4),
+.process-row .process-item:nth-child(4),
+.video-grid .video-card:nth-child(4) {
+  transition-delay: 0.45s;
+}
+
+
