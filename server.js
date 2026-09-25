@@ -144,7 +144,8 @@ const DEFAULT_CONTENT = {
       { url: "/uploads/photo-1790225930717-710121742.jpg", caption: "Seguimiento en Vivo" }
     ],
     autoplay: true,
-    interval: 4
+    interval: 4,
+    fit: "cover"
   },
 
   about: {
@@ -178,7 +179,9 @@ const DEFAULT_CONTENT = {
 
   gallerySection: {
     heading: "Galería",
-    lede: "Elegí una foto desde la cinta al final de la página para verla en grande acá."
+    lede: "Elegí una foto desde la cinta al final de la página para verla en grande acá.",
+    fit: "contain",
+    height: "tall"
   },
 
   videosSection: {

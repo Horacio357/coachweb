@@ -194,6 +194,12 @@
       return;
     }
 
+    if (hero.fit === "contain") {
+      box.classList.add("fit-contain");
+    } else {
+      box.classList.remove("fit-contain");
+    }
+
     let html = imageList.map((item, i) => `
       <img src="${escapeAttr(item.url)}" alt="${escapeHtml(item.caption || "")}" class="hero-slide ${i === 0 ? "active" : ""}" data-index="${i}" onerror="this.style.opacity=0;">
     `).join("");
@@ -402,9 +408,43 @@
 
     try { trackMedia("photo", photos[0].url, photos[0].caption); } catch(e){}
 
+    const fitMode = (gallerySection && gallerySection.fit) || "contain";
+    const heightMode = (gallerySection && gallerySection.height) || "tall";
+
+    viewer.classList.remove("height-tall", "height-medium", "height-standard");
+    viewer.classList.add(`height-${heightMode}`);
+
+    if (fitMode === "cover") {
+      viewer.classList.add("fit-cover");
+    } else {
+      viewer.classList.remove("fit-cover");
+    }
+
+    const isCover = viewer.classList.contains("fit-cover");
+
     viewer.innerHTML =
-      photos.map((p, i) => `<img data-i="${i}" src="${escapeAttr(p.url)}" alt="${escapeHtml(p.caption || "")}" class="${i === 0 ? "active" : ""}">`).join("") +
-      `<span class="gallery-caption" id="gallery-caption">${escapeHtml(photos[0].caption || "")}</span>`;
+      photos.map((p, i) => `
+        <img class="gallery-bg-blur ${i === 0 ? "active" : ""}" data-i="${i}" src="${escapeAttr(p.url)}" alt="" aria-hidden="true">
+        <img class="gallery-main-img ${i === 0 ? "active" : ""}" data-i="${i}" src="${escapeAttr(p.url)}" alt="${escapeHtml(p.caption || "")}">
+      `).join("") +
+      `<div class="gallery-controls-bar">
+        <span class="gallery-caption" id="gallery-caption">${escapeHtml(photos[0].caption || "")}</span>
+        <button type="button" class="gallery-fit-btn" id="gallery-fit-toggle" title="Alternar entre foto completa y rellenar">
+          <span class="fit-label">${isCover ? "⛶ Foto completa" : "🖼️ Rellenar"}</span>
+        </button>
+      </div>`;
+
+    const toggleBtn = viewer.querySelector("#gallery-fit-toggle");
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const nowCover = viewer.classList.toggle("fit-cover");
+        const label = toggleBtn.querySelector(".fit-label");
+        if (label) {
+          label.textContent = nowCover ? "⛶ Foto completa" : "🖼️ Rellenar";
+        }
+      });
+    }
 
     filmstrip.innerHTML = photos.map((p, i) => `
       <button data-i="${i}" class="${i === 0 ? "active" : ""}" aria-label="Ver foto ${i + 1}">
@@ -418,8 +458,8 @@
         if (!photos[i]) return;
         filmstrip.querySelectorAll("button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        viewer.querySelectorAll("img").forEach(img => {
-          img.classList.toggle("active", parseInt(img.getAttribute("data-i"), 10) === i);
+        viewer.querySelectorAll("[data-i]").forEach(el => {
+          el.classList.toggle("active", parseInt(el.getAttribute("data-i"), 10) === i);
         });
         const captionElem = document.getElementById("gallery-caption");
         if (captionElem) captionElem.textContent = photos[i].caption || "";

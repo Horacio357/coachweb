@@ -171,10 +171,15 @@ nav.main-nav a:hover{color:var(--white);}
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 20%;
   opacity: 0;
   transform: scale(1.06);
   transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.8s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
+}
+.hero-visual.fit-contain .hero-slide {
+  object-fit: contain;
+  object-position: center;
 }
 .hero-slide.active {
   opacity: 1;
@@ -225,7 +230,7 @@ nav.main-nav a:hover{color:var(--white);}
   background:linear-gradient(150deg,var(--charcoal),var(--violet-900));
   display:flex;align-items:center;justify-content:center;
 }
-.about-photo img{width:100%;height:100%;object-fit:cover;}
+.about-photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%;}
 .badge{
   display:inline-flex;align-items:center;gap:8px;margin-top:22px;
   padding:8px 14px;border-radius:999px;background:var(--charcoal);
@@ -259,21 +264,82 @@ nav.main-nav a:hover{color:var(--white);}
 /* ---------- gallery ---------- */
 .gallery-viewer{
   position:relative;border-radius:16px;overflow:hidden;
-  aspect-ratio:16/9;background:var(--charcoal);
+  background:var(--charcoal);
   display:flex;align-items:center;justify-content:center;
+  min-height:500px;height:580px;max-height:80vh;
+  box-shadow:0 16px 40px rgba(0,0,0,.45);
+  transition:height .3s ease;
 }
-.gallery-viewer img{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0;transform:scale(1.04);
-  transition:opacity .55s ease, transform .7s ease;
+.gallery-viewer.height-tall{min-height:560px;height:640px;}
+.gallery-viewer.height-medium{min-height:450px;height:520px;}
+.gallery-viewer.height-standard{aspect-ratio:16/9;height:auto;min-height:360px;}
+
+/* Fondo difuminado ambiental para ambientar fotos verticales sin bordes negros secos */
+.gallery-viewer .gallery-bg-blur{
+  position:absolute;inset:-30px;
+  width:calc(100% + 60px);height:calc(100% + 60px);
+  object-fit:cover;object-position:center;
+  filter:blur(36px) brightness(0.35) saturate(1.25);
+  opacity:0;transition:opacity .55s ease;
+  pointer-events:none;z-index:1;
 }
-.gallery-viewer img.active{opacity:1;transform:scale(1);}
+.gallery-viewer .gallery-bg-blur.active{opacity:1;}
+
+/* Foto frontal nítida */
+.gallery-viewer .gallery-main-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:contain; /* Foto completa sin recortes por defecto */
+  object-position:center;
+  opacity:0;transform:scale(0.98);
+  transition:opacity .45s ease, transform .5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index:2;pointer-events:none;
+}
+.gallery-viewer .gallery-main-img.active{
+  opacity:1;transform:scale(1);
+  pointer-events:auto;
+}
+
+/* Modo rellenar visor cuando el usuario prefiere recorte panorámico */
+.gallery-viewer.fit-cover .gallery-main-img{
+  object-fit:cover;
+  object-position:center 20%;
+}
+
+.gallery-controls-bar{
+  position:absolute;left:20px;right:20px;bottom:16px;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  pointer-events:none;
+}
 .gallery-caption{
-  position:absolute;left:20px;bottom:16px;z-index:2;
-  font-size:13.5px;color:var(--gray-100);background:rgba(11,10,15,.55);
-  padding:6px 12px;border-radius:999px;backdrop-filter:blur(6px);
+  font-size:13.5px;color:var(--gray-100);background:rgba(11,10,15,.75);
+  padding:6px 14px;border-radius:999px;backdrop-filter:blur(8px);
+  border:1px solid rgba(247,245,251,.12);
+  pointer-events:auto;max-width:70%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+.gallery-fit-btn{
+  background:rgba(11,10,15,.75);border:1px solid rgba(247,245,251,.2);
+  color:var(--white);padding:6px 14px;border-radius:999px;
+  font-size:12px;font-family:var(--font-body);font-weight:500;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  backdrop-filter:blur(8px);
+  transition:background .2s ease, transform .15s ease, border-color .2s ease;
+  pointer-events:auto;
+}
+.gallery-fit-btn:hover{
+  background:var(--violet-900);border-color:var(--violet-500);
+  transform:translateY(-1px);
+}
+
 .gallery-empty{color:var(--gray-500);font-size:14px;text-align:center;padding:0 20px;}
+
+@media (max-width:860px){
+  .gallery-viewer{min-height:360px;height:420px;}
+  .gallery-viewer.height-tall{height:470px;}
+  .gallery-controls-bar{left:12px;right:12px;bottom:12px;}
+  .gallery-caption{max-width:55%;font-size:12px;}
+}
 
 /* ---------- videos ---------- */
 .video-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;}

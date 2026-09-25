@@ -275,9 +275,18 @@
           </label>
         </div>
 
-        <div class="field" style="max-width:300px;margin-bottom:16px;">
-          <label for="hero-interval">Tiempo de cambio (segundos)</label>
-          <input id="hero-interval" type="number" min="1" max="20" value="4">
+        <div class="two-col" style="margin-bottom:16px;">
+          <div class="field" style="margin:0;">
+            <label for="hero-interval">Tiempo de cambio (segundos)</label>
+            <input id="hero-interval" type="number" min="1" max="20" value="4">
+          </div>
+          <div class="field" style="margin:0;">
+            <label for="hero-fit-mode">Enfoque de fotos en portada</label>
+            <select id="hero-fit-mode">
+              <option value="cover">🖼️ Rellenar portada (Enfoque superior / No corta cabezas)</option>
+              <option value="contain">✨ Foto completa sin recortes</option>
+            </select>
+          </div>
         </div>
 
         <div class="item-list" id="hero-photo-list"></div>
@@ -353,6 +362,28 @@
       <h2>📸 Fotos de Galería</h2>
       <p class="desc">Podés realizar carga masiva (10, 20 o más fotos juntas), cambiar o quitar cualquier imagen. Aparecen en la sección Galería y en la cinta inferior.</p>
       
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(247,245,251,0.08);border-radius:10px;padding:16px 20px;margin-bottom:18px;">
+        <h4 style="margin:0 0 6px;font-size:14.5px;color:var(--violet-200);">📐 Adaptabilidad de Fotos en el Visor</h4>
+        <p class="desc" style="margin-bottom:12px;font-size:13px;">Configurá cómo se adaptan las fotos verticales, horizontales y cuadradas para que nunca queden truncas ni con cabezas cortadas:</p>
+        <div class="two-col">
+          <div class="field" style="margin:0;">
+            <label for="gallery-fit-mode">Modo de ajuste de imagen</label>
+            <select id="gallery-fit-mode">
+              <option value="contain">✨ Foto completa sin recortes (Con fondo ambiental difuminado) — Recomendado para fotos verticales y poses</option>
+              <option value="cover">🖼️ Rellenar visor (Recorte panorámico centrado en rostro)</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0;">
+            <label for="gallery-height-mode">Altura del visor principal</label>
+            <select id="gallery-height-mode">
+              <option value="tall">Amplio (640px — Mayor altura para poses verticales y cuerpo entero)</option>
+              <option value="medium">Medio (520px)</option>
+              <option value="standard">Estándar (16:9)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
         <label class="btn btn-primary" style="padding:10px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
           📁 Cargar fotos en lote (10/20 fotos juntas)

@@ -471,6 +471,8 @@
     // Animación y Fotos de Portada (Hero Visual)
     document.getElementById("hero-autoplay").checked = (c.hero.autoplay !== false);
     document.getElementById("hero-interval").value = c.hero.interval || 4;
+    const heroFit = document.getElementById("hero-fit-mode");
+    if (heroFit) heroFit.value = c.hero.fit || "cover";
 
     if ((!c.hero.images || c.hero.images.length === 0) && c.hero.image) {
       c.hero.images = [{ url: c.hero.image, caption: "" }];
@@ -495,6 +497,10 @@
     const gs = c.gallerySection || {};
     document.getElementById("t-gallery-heading").value = gs.heading || "";
     document.getElementById("t-gallery-lede").value = gs.lede || "";
+    const galFit = document.getElementById("gallery-fit-mode");
+    if (galFit) galFit.value = gs.fit || "contain";
+    const galHeight = document.getElementById("gallery-height-mode");
+    if (galHeight) galHeight.value = gs.height || "tall";
 
     const vs = c.videosSection || {};
     document.getElementById("t-videos-heading").value = vs.heading || "";
@@ -949,6 +955,8 @@
 
     c.hero.autoplay = document.getElementById("hero-autoplay").checked;
     c.hero.interval = parseInt(document.getElementById("hero-interval").value, 10) || 4;
+    const heroFitEl = document.getElementById("hero-fit-mode");
+    if (heroFitEl) c.hero.fit = heroFitEl.value;
 
     if (c.hero.images && c.hero.images.length > 0) {
       c.hero.image = c.hero.images[0].url;
@@ -972,6 +980,10 @@
     c.gallerySection = c.gallerySection || {};
     c.gallerySection.heading = document.getElementById("t-gallery-heading").value.trim();
     c.gallerySection.lede = document.getElementById("t-gallery-lede").value.trim();
+    const galFitEl = document.getElementById("gallery-fit-mode");
+    if (galFitEl) c.gallerySection.fit = galFitEl.value;
+    const galHeightEl = document.getElementById("gallery-height-mode");
+    if (galHeightEl) c.gallerySection.height = galHeightEl.value;
 
     c.videosSection = c.videosSection || {};
     c.videosSection.heading = document.getElementById("t-videos-heading").value.trim();
