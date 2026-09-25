@@ -374,7 +374,15 @@
         });
         const data = await res.json();
 
+        if (res.status === 401) {
+          alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+          showLogin();
+          return;
+        }
+
         if (res.ok && data.success && Array.isArray(data.files)) {
+          // Limpiar filas vacías por defecto de la galería
+          currentContent.gallery = (currentContent.gallery || []).filter(item => item && item.url && item.url.trim() !== "");
           data.files.forEach(item => {
             currentContent.gallery.push({ url: item.url, caption: "" });
           });
@@ -382,7 +390,7 @@
           els.saveBtn.click();
           if (statusSpan) {
             statusSpan.style.color = "#9ee6b8";
-            statusSpan.textContent = `✅ ¡${data.files.length} fotos cargadas exitosamente!`;
+            statusSpan.textContent = `✅ ¡${data.files.length} fotos cargadas y guardadas exitosamente!`;
             setTimeout(() => { statusSpan.textContent = ""; }, 5000);
           }
         } else {

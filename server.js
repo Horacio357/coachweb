@@ -230,18 +230,37 @@ if (configCount === 0) {
   console.log("[SQLite] Configuración inicial cargada en la base de datos.");
 }
 
-// Session Tokens simples en memoria
-const activeTokens = new Map();
+// Session Tokens persistentes (basados en HMAC para sobrevivir a reinicios del servidor)
+const crypto = require("crypto");
+const SERVER_SECRET = "britov_coach_secret_key_2026";
 
-function generateToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+function generateToken(user) {
+  const payload = `${user.id}:${user.email}:${user.password_hash}`;
+  const sig = crypto.createHmac("sha256", SERVER_SECRET).update(payload).digest("hex");
+  return Buffer.from(`${user.id}:${sig}`).toString("base64");
 }
 
 function verifyToken(req) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return false;
   const token = authHeader.replace("Bearer ", "").trim();
-  return activeTokens.has(token);
+  if (!token) return false;
+
+  try {
+    const decoded = Buffer.from(token, "base64").toString("utf8");
+    const [userIdStr, sig] = decoded.split(":");
+    const userId = parseInt(userIdStr, 10);
+    if (!userId || !sig) return false;
+
+    const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+    if (!user) return false;
+
+    const expectedPayload = `${user.id}:${user.email}:${user.password_hash}`;
+    const expectedSig = crypto.createHmac("sha256", SERVER_SECRET).update(expectedPayload).digest("hex");
+    return sig === expectedSig;
+  } catch (e) {
+    return false;
+  }
 }
 
 function deepMerge(target, source) {
@@ -302,8 +321,7 @@ app.post("/api/login", (req, res) => {
     return res.status(401).json({ error: "Credenciales inválidas" });
   }
 
-  const token = generateToken();
-  activeTokens.set(token, { userId: user.id, email: user.email });
+  const token = generateToken(user);
   res.json({ success: true, token, email: user.email });
 });
 

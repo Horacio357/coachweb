@@ -612,20 +612,14 @@
     });
   }
 
-  async function init() {
-    // Red de seguridad: revelar elementos tras un instante para evitar pantallas negras
-    setTimeout(() => {
-      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
-    }, 400);
+  let lastContentJson = "";
 
-    safeRun(setupMobileNav, "MobileNav");
-    safeRun(trackVisit, "TrackVisit");
-
-    content = await loadContent();
-    if (!content) {
-      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
-      return;
-    }
+  function renderAll(newContent) {
+    if (!newContent) return;
+    const json = JSON.stringify(newContent);
+    if (json === lastContentJson) return;
+    lastContentJson = json;
+    content = newContent;
 
     safeRun(() => applyColors(content.colors), "Colors");
     safeRun(() => applySectionVisibility(content.sections), "SectionVisibility");
@@ -641,10 +635,39 @@
     safeRun(() => renderContactAndSocial(content.contact, content.social), "Contact");
     safeRun(() => renderFooter(content.brand, content.footer), "Footer");
     safeRun(() => setupScrollReveal(content.effects), "ScrollReveal");
+  }
+
+  async function checkLiveUpdates() {
+    try {
+      const freshContent = await loadContent();
+      if (freshContent) renderAll(freshContent);
+    } catch (e) {}
+  }
+
+  async function init() {
+    // Red de seguridad: revelar elementos tras un instante para evitar pantallas negras
+    setTimeout(() => {
+      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+    }, 400);
+
+    safeRun(setupMobileNav, "MobileNav");
+    safeRun(trackVisit, "TrackVisit");
+
+    content = await loadContent();
+    if (!content) {
+      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+      return;
+    }
+
+    renderAll(content);
 
     setTimeout(() => {
       document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
     }, 150);
+
+    // Polling en tiempo real cada 3 segundos y al enfocar la pestaña
+    setInterval(checkLiveUpdates, 3000);
+    window.addEventListener("focus", checkLiveUpdates);
   }
 
   document.addEventListener("DOMContentLoaded", init);
