@@ -156,7 +156,7 @@
 
   let heroTimer = null;
 
-  function renderHero(hero) {
+  function renderHero(hero, backgrounds) {
     if (!hero) return;
     const kicker = document.getElementById("hero-kicker");
     const heading = document.getElementById("hero-heading");
@@ -183,6 +183,10 @@
     }
     if (!imageList.length && hero.image) {
       imageList = [{ url: hero.image, caption: "" }];
+    }
+    // Fallback: usar la imagen de fondo del hero si no hay fotos de portada
+    if (!imageList.length && backgrounds && backgrounds.hero && backgrounds.hero.image) {
+      imageList = [{ url: backgrounds.hero.image, caption: "" }];
     }
 
     if (!imageList.length) {
@@ -531,6 +535,10 @@
     `;
   }
 
+  function escapeAttr(str) {
+    return String(str || "").replace(/"/g, "&quot;");
+  }
+
   function escapeHtml(str) {
     return String(str || "").replace(/[&<>"']/g, m => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -626,7 +634,7 @@
     safeRun(() => renderBackgrounds(content.backgrounds), "Backgrounds");
     safeRun(() => renderNav(content.nav), "Nav");
     safeRun(() => renderRibbon(content.ribbon), "Ribbon");
-    safeRun(() => renderHero(content.hero), "Hero");
+    safeRun(() => renderHero(content.hero, content.backgrounds), "Hero");
     safeRun(() => renderAbout(content.about), "About");
     safeRun(() => renderServices(content.servicesSection, content.services), "Services");
     safeRun(() => renderProcess(content.processSection, content.process), "Process");
