@@ -93,7 +93,7 @@
     if (heroLayer) {
       if (backgrounds.hero && backgrounds.hero.image) {
         const opacity = backgrounds.hero.opacity !== undefined ? backgrounds.hero.opacity : 0.35;
-        heroLayer.innerHTML = `<img src="${backgrounds.hero.image}" alt="" style="opacity:${opacity};">`;
+        heroLayer.innerHTML = `<img src="${escapeAttr(backgrounds.hero.image)}" alt="" style="opacity:${opacity};" onerror="this.style.display='none';">`;
       } else {
         heroLayer.innerHTML = "";
       }
@@ -104,7 +104,7 @@
     if (aboutLayer) {
       if (backgrounds.about && backgrounds.about.image) {
         const opacity = backgrounds.about.opacity !== undefined ? backgrounds.about.opacity : 0.20;
-        aboutLayer.innerHTML = `<img src="${backgrounds.about.image}" alt="" style="opacity:${opacity};">`;
+        aboutLayer.innerHTML = `<img src="${escapeAttr(backgrounds.about.image)}" alt="" style="opacity:${opacity};" onerror="this.style.display='none';">`;
       } else {
         aboutLayer.innerHTML = "";
       }
@@ -115,7 +115,7 @@
     if (contactLayer) {
       if (backgrounds.contact && backgrounds.contact.image) {
         const opacity = backgrounds.contact.opacity !== undefined ? backgrounds.contact.opacity : 0.30;
-        contactLayer.innerHTML = `<img src="${backgrounds.contact.image}" alt="" style="opacity:${opacity};">`;
+        contactLayer.innerHTML = `<img src="${escapeAttr(backgrounds.contact.image)}" alt="" style="opacity:${opacity};" onerror="this.style.display='none';">`;
       } else {
         contactLayer.innerHTML = "";
       }
@@ -191,7 +191,7 @@
     }
 
     let html = imageList.map((item, i) => `
-      <img src="${item.url}" alt="${escapeHtml(item.caption || "")}" class="hero-slide ${i === 0 ? "active" : ""}" data-index="${i}">
+      <img src="${escapeAttr(item.url)}" alt="${escapeHtml(item.caption || "")}" class="hero-slide ${i === 0 ? "active" : ""}" data-index="${i}" onerror="this.style.opacity=0;">
     `).join("");
 
     if (imageList.length > 1) {
@@ -257,7 +257,7 @@
 
     if (about.image) {
       const box = document.getElementById("about-photo");
-      if (box) box.innerHTML = `<img src="${about.image}" alt="">`;
+      if (box) box.innerHTML = `<img src="${escapeAttr(about.image)}" alt="" onerror="this.style.opacity=0;">`;
     }
   }
 

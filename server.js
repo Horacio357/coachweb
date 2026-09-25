@@ -269,14 +269,14 @@ app.get("/api/config", (req, res) => {
   try {
     const row = db.prepare("SELECT content FROM site_config WHERE id = 1").get();
     if (!row) {
-      return res.status(404).json({ error: "Configuración no encontrada" });
+      return res.json(DEFAULT_CONTENT);
     }
     const data = JSON.parse(row.content);
     const merged = deepMerge(DEFAULT_CONTENT, data);
     res.json(merged);
   } catch (err) {
     console.error("Error leyendo SQLite:", err);
-    res.status(500).json({ error: "Error al leer la base de datos SQLite" });
+    res.json(DEFAULT_CONTENT);
   }
 });
 
@@ -314,7 +314,10 @@ app.post("/api/config", (req, res) => {
 
   try {
     const newContent = req.body;
-    db.prepare("UPDATE site_config SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1").run(
+    if (!newContent || typeof newContent !== "object") {
+      return res.status(400).json({ error: "Contenido inválido" });
+    }
+    db.prepare("INSERT OR REPLACE INTO site_config (id, content, updated_at) VALUES (1, ?, CURRENT_TIMESTAMP)").run(
       JSON.stringify(newContent)
     );
     res.json({ success: true, message: "Cambios guardados en SQLite correctamente" });
