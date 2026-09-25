@@ -116,9 +116,9 @@ const DEFAULT_CONTENT = {
   },
 
   backgrounds: {
-    hero: { image: "", opacity: 0.35 },
-    about: { image: "", opacity: 0.20 },
-    contact: { image: "", opacity: 0.30 }
+    hero: { image: "/uploads/photo-1790225910261-670298077.png", opacity: 0.35 },
+    about: { image: "/uploads/photo-1790225930717-710121742.jpg", opacity: 0.20 },
+    contact: { image: "/uploads/photo-1790225958867-383414922.jpg", opacity: 0.30 }
   },
 
   nav: {
@@ -137,8 +137,11 @@ const DEFAULT_CONTENT = {
     subheading: "Entrenamiento personalizado y grupal con seguimiento real: evaluación inicial, plan a medida y ajustes semana a semana.",
     ctaPrimary: "Reservar evaluación",
     ctaSecondary: "Ver servicios",
-    image: "",
-    images: [],
+    image: "/uploads/photo-1790225910261-670298077.png",
+    images: [
+      { url: "/uploads/photo-1790225910261-670298077.png", caption: "Entrenamiento Personalizado" },
+      { url: "/uploads/photo-1790225930717-710121742.jpg", caption: "Seguimiento en Vivo" }
+    ],
     autoplay: true,
     interval: 4
   },
@@ -147,7 +150,7 @@ const DEFAULT_CONTENT = {
     heading: "Sobre mí",
     text: "Soy entrenadora personal certificada (Personal Training y Group Fitness, ORTHOS Barcelona). Trabajo con personas que quieren un plan claro, sostenible y adaptado a su rutina real — no una tabla genérica de internet. Cada plan se revisa y se ajusta con el progreso.",
     badge: "Certificación Personal Training & Group Fitness — ORTHOS Barcelona",
-    image: ""
+    image: "/uploads/photo-1790225930717-710121742.jpg"
   },
 
   servicesSection: {
@@ -179,18 +182,18 @@ const DEFAULT_CONTENT = {
 
   videosSection: {
     heading: "Videos",
-    lede: "Mira nuestros entrenamientos en acción."
+    lede: "Mira nuestros entrenamientos en action."
   },
 
   gallery: [
-    { url: "", caption: "Foto 1 — reemplazá desde el panel admin" },
-    { url: "", caption: "Foto 2 — reemplazá desde el panel admin" },
-    { url: "", caption: "Foto 3 — reemplazá desde el panel admin" },
-    { url: "", caption: "Foto 4 — reemplazá desde el panel admin" }
+    { url: "/uploads/photo-1790225829732-949945207.png", caption: "Entrenamiento en Gimnasio" },
+    { url: "/uploads/photo-1790225910261-670298077.png", caption: "Seguimiento Personalizado" },
+    { url: "/uploads/photo-1790225930717-710121742.jpg", caption: "Técnica y Fuerza" },
+    { url: "/uploads/photo-1790225958867-383414922.jpg", caption: "Evaluación de Progreso" }
   ],
 
   videos: [
-    { url: "", caption: "Video 1 — agregá un link de YouTube o Vimeo desde el admin" }
+    { url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", caption: "Demostración de Rutina y Técnica" }
   ],
 
   contact: {
