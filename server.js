@@ -10,7 +10,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuración de almacenamiento local para fotos y videos (uploads/)
-const uploadsDir = path.join(__dirname, "uploads");
+const dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || process.env.DATA_DIR || __dirname;
+const uploadsDir = path.join(dataDir, "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -41,7 +42,7 @@ const upload = multer({
 });
 
 // Inicialización de SQLite
-const dbPath = path.join(__dirname, "database.sqlite");
+const dbPath = path.join(dataDir, "database.sqlite");
 const db = new Database(dbPath);
 
 // Creación de tablas si no existen
@@ -488,12 +489,16 @@ app.get("/api/analytics/stats", (req, res) => {
     res.status(500).json({ error: "No se pudieron calcular las estadísticas" });
   }
 });
+app.get(["/admin", "/admin/*"], (req, res) => {
+  res.sendFile(path.join(__dirname, "admin", "index.html"));
+});
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`\n==================================================`);
   console.log(` Britov.Coach con SQLite iniciado exitosamente!`);
-  console.log(` Sitio público: http://localhost:3000`);
-  console.log(` Panel Admin:   http://localhost:3000/admin`);
+  console.log(` Puerto: ${PORT} (0.0.0.0)`);
+  console.log(` Sitio público: http://localhost:${PORT}`);
+  console.log(` Panel Admin:   http://localhost:${PORT}/admin`);
   console.log(` Base SQLite:   ${dbPath}`);
   console.log(`==================================================\n`);
 });
