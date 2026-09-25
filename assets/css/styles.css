@@ -391,8 +391,16 @@ footer.site-footer{background:var(--charcoal);border-top:1px solid rgba(247,245,
   will-change: opacity, transform;
 }
 .reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 .services-row .card:nth-child(2),

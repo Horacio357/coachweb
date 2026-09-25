@@ -269,10 +269,11 @@
 
     const row = document.getElementById("services-row");
     if (!row) return;
-    row.innerHTML = (services || []).map(s => `
+    const list = (services || []).filter(s => s && (s.title || s.text));
+    row.innerHTML = list.map(s => `
       <div class="card">
-        <h3>${escapeHtml(s.title)}</h3>
-        <p>${escapeHtml(s.text)}</p>
+        <h3>${escapeHtml(s.title || "")}</h3>
+        <p>${escapeHtml(s.text || "")}</p>
       </div>
     `).join("");
   }
@@ -285,11 +286,12 @@
 
     const row = document.getElementById("process-row");
     if (!row) return;
-    row.innerHTML = (process || []).map((p, i) => `
+    const list = (process || []).filter(p => p && (p.title || p.text));
+    row.innerHTML = list.map((p, i) => `
       <div class="process-item">
         <span class="num">${String(i + 1).padStart(2, "0")}</span>
-        <h3>${escapeHtml(p.title)}</h3>
-        <p>${escapeHtml(p.text)}</p>
+        <h3>${escapeHtml(p.title || "")}</h3>
+        <p>${escapeHtml(p.text || "")}</p>
       </div>
     `).join("");
   }
@@ -302,7 +304,7 @@
 
     const grid = document.getElementById("video-grid");
     if (!grid) return;
-    const list = (videos || []).filter(v => v.url);
+    const list = (videos || []).filter(v => v && v.url);
     if (!list.length) {
       grid.innerHTML = `<p style="color:var(--gray-500);font-size:14px;">Todavía no hay videos cargados. Se agregan desde el panel admin.</p>`;
       return;
@@ -330,22 +332,28 @@
 
   function toEmbedUrl(rawUrl) {
     if (!rawUrl) return { isDirectFile: false, url: "" };
-    const url = rawUrl.trim();
+    let url = String(rawUrl).trim();
+    if (!url) return { isDirectFile: false, url: "" };
 
     const ext = url.split(/[?#]/)[0].split('.').pop().toLowerCase();
-    const isDirectFile = /^(mp4|webm|mov|ogg|m4v)$/.test(ext) || url.startsWith("/uploads/video-");
+    const isDirectFile = /^(mp4|webm|mov|ogg|m4v)$/.test(ext) || url.startsWith("/uploads/");
     if (isDirectFile) {
       return { isDirectFile: true, url: url };
     }
 
     try {
+      let normalized = url;
+      if (!normalized.startsWith("http://") && !normalized.startsWith("https://")) {
+        normalized = "https://" + normalized;
+      }
       if (url.includes("youtube.com/shorts/")) {
         const id = url.split("youtube.com/shorts/")[1].split(/[?&]/)[0];
         return { isDirectFile: false, url: `https://www.youtube.com/embed/${id}` };
       }
       if (url.includes("youtube.com/watch?v=")) {
-        const id = new URL(url).searchParams.get("v");
-        return { isDirectFile: false, url: `https://www.youtube.com/embed/${id}` };
+        const parsed = new URL(normalized);
+        const id = parsed.searchParams.get("v");
+        if (id) return { isDirectFile: false, url: `https://www.youtube.com/embed/${id}` };
       }
       if (url.includes("youtu.be/")) {
         const id = url.split("youtu.be/")[1].split(/[?&]/)[0];
@@ -363,7 +371,9 @@
           return { isDirectFile: false, url: `https://www.instagram.com/${parts[typeIdx]}/${id}/embed` };
         }
       }
-    } catch (e) { /* fall through */ }
+    } catch (e) {
+      console.warn("Error parseando URL de video:", e);
+    }
 
     return { isDirectFile: false, url: url };
   }
@@ -378,7 +388,7 @@
     const filmstrip = document.getElementById("filmstrip");
     if (!viewer || !filmstrip) return;
 
-    const photos = (gallery || []).filter(g => g.url);
+    const photos = (gallery || []).filter(g => g && g.url);
 
     if (!photos.length) {
       viewer.innerHTML = `<p class="gallery-empty">Todavía no hay fotos cargadas. Se agregan desde el panel admin.</p>`;
@@ -386,21 +396,22 @@
       return;
     }
 
-    trackMedia("photo", photos[0].url, photos[0].caption);
+    try { trackMedia("photo", photos[0].url, photos[0].caption); } catch(e){}
 
     viewer.innerHTML =
-      photos.map((p, i) => `<img data-i="${i}" src="${p.url}" alt="${escapeHtml(p.caption || "")}" class="${i === 0 ? "active" : ""}">`).join("") +
+      photos.map((p, i) => `<img data-i="${i}" src="${escapeAttr(p.url)}" alt="${escapeHtml(p.caption || "")}" class="${i === 0 ? "active" : ""}">`).join("") +
       `<span class="gallery-caption" id="gallery-caption">${escapeHtml(photos[0].caption || "")}</span>`;
 
     filmstrip.innerHTML = photos.map((p, i) => `
       <button data-i="${i}" class="${i === 0 ? "active" : ""}" aria-label="Ver foto ${i + 1}">
-        <img src="${p.url}" alt="">
+        <img src="${escapeAttr(p.url)}" alt="">
       </button>
     `).join("");
 
     filmstrip.querySelectorAll("button[data-i]").forEach(btn => {
       btn.addEventListener("click", () => {
         const i = parseInt(btn.getAttribute("data-i"), 10);
+        if (!photos[i]) return;
         filmstrip.querySelectorAll("button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         viewer.querySelectorAll("img").forEach(img => {
@@ -409,7 +420,7 @@
         const captionElem = document.getElementById("gallery-caption");
         if (captionElem) captionElem.textContent = photos[i].caption || "";
 
-        trackMedia("photo", photos[i].url, photos[i].caption);
+        try { trackMedia("photo", photos[i].url, photos[i].caption); } catch(e){}
 
         const galSec = document.getElementById("gallery");
         if (galSec) galSec.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -559,28 +570,51 @@
           obs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.05 });
 
     reveals.forEach(el => observer.observe(el));
   }
 
+  function safeRun(fn, name) {
+    try {
+      fn();
+    } catch (e) {
+      console.error(`[Britov.Coach] Error en ${name || "sección"}:`, e);
+    }
+  }
+
   async function init() {
-    setupMobileNav();
-    trackVisit();
+    // Red de seguridad: revelar elementos tras un instante para evitar pantallas negras
+    setTimeout(() => {
+      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+    }, 400);
+
+    safeRun(setupMobileNav, "MobileNav");
+    safeRun(trackVisit, "TrackVisit");
+
     content = await loadContent();
-    applyColors(content.colors);
-    renderBackgrounds(content.backgrounds);
-    renderNav(content.nav);
-    renderRibbon(content.ribbon);
-    renderHero(content.hero);
-    renderAbout(content.about);
-    renderServices(content.servicesSection, content.services);
-    renderProcess(content.processSection, content.process);
-    renderGalleryAndFilmstrip(content.gallerySection, content.gallery);
-    renderVideosSection(content.videosSection, content.videos);
-    renderContactAndSocial(content.contact, content.social);
-    renderFooter(content.brand, content.footer);
-    setupScrollReveal(content.effects);
+    if (!content) {
+      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+      return;
+    }
+
+    safeRun(() => applyColors(content.colors), "Colors");
+    safeRun(() => renderBackgrounds(content.backgrounds), "Backgrounds");
+    safeRun(() => renderNav(content.nav), "Nav");
+    safeRun(() => renderRibbon(content.ribbon), "Ribbon");
+    safeRun(() => renderHero(content.hero), "Hero");
+    safeRun(() => renderAbout(content.about), "About");
+    safeRun(() => renderServices(content.servicesSection, content.services), "Services");
+    safeRun(() => renderProcess(content.processSection, content.process), "Process");
+    safeRun(() => renderGalleryAndFilmstrip(content.gallerySection, content.gallery), "Gallery");
+    safeRun(() => renderVideosSection(content.videosSection, content.videos), "Videos");
+    safeRun(() => renderContactAndSocial(content.contact, content.social), "Contact");
+    safeRun(() => renderFooter(content.brand, content.footer), "Footer");
+    safeRun(() => setupScrollReveal(content.effects), "ScrollReveal");
+
+    setTimeout(() => {
+      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+    }, 150);
   }
 
   document.addEventListener("DOMContentLoaded", init);
