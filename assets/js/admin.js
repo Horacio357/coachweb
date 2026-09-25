@@ -327,6 +327,7 @@
           if (res.ok && data.success) {
             textInput.value = data.url;
             updateFieldPreview(textInputId, previewImgId, previewBoxId);
+            els.saveBtn.click();
           } else {
             alert("Error al subir imagen: " + (data.error || "Desconocido"));
             textInput.value = "";
@@ -378,6 +379,7 @@
             currentContent.gallery.push({ url: item.url, caption: "" });
           });
           renderPhotoList();
+          els.saveBtn.click();
           if (statusSpan) {
             statusSpan.style.color = "#9ee6b8";
             statusSpan.textContent = `✅ ¡${data.files.length} fotos cargadas exitosamente!`;
@@ -583,6 +585,7 @@
           currentContent.hero.images[i].url = data.url;
           thumbImg.src = data.url;
           thumbImg.style.opacity = "1";
+          els.saveBtn.click();
         } else {
           alert("Error al subir imagen: " + (data.error || "Desconocido"));
           urlInput.value = currentContent.hero.images[i].url || "";
@@ -596,6 +599,7 @@
     row.querySelector(".remove").addEventListener("click", () => {
       currentContent.hero.images.splice(i, 1);
       renderHeroPhotoList();
+      els.saveBtn.click();
     });
 
     return row;
@@ -659,6 +663,7 @@
           currentContent.gallery[i].url = data.url;
           thumbImg.src = data.url;
           thumbImg.style.opacity = "1";
+          els.saveBtn.click();
         } else {
           alert("Error al subir imagen: " + (data.error || "Desconocido"));
           urlInput.value = currentContent.gallery[i].url || "";
@@ -672,6 +677,7 @@
     row.querySelector(".remove").addEventListener("click", () => {
       currentContent.gallery.splice(i, 1);
       renderPhotoList();
+      els.saveBtn.click();
     });
 
     return row;
@@ -726,6 +732,7 @@
         if (res.ok && data.success) {
           urlInput.value = data.url;
           currentContent.videos[i].url = data.url;
+          els.saveBtn.click();
         } else {
           alert("Error al subir video: " + (data.error || "Desconocido"));
           urlInput.value = currentContent.videos[i].url || "";
@@ -739,6 +746,7 @@
     row.querySelector(".remove").addEventListener("click", () => {
       currentContent.videos.splice(i, 1);
       renderVideoList();
+      els.saveBtn.click();
     });
 
     return row;
@@ -988,6 +996,43 @@
 
     if (c.social.whatsapp) c.contact.whatsapp = c.social.whatsapp;
     if (c.social.instagram) c.contact.instagram = c.social.instagram;
+
+    // Coleccionar Listas Dinámicas desde el DOM
+    if (els.heroPhotoList) {
+      c.hero.images = Array.from(els.heroPhotoList.querySelectorAll(".item-row")).map(row => ({
+        url: row.querySelector('[data-field="url"]')?.value.trim() || "",
+        caption: row.querySelector('[data-field="caption"]')?.value.trim() || ""
+      }));
+      if (c.hero.images.length > 0) c.hero.image = c.hero.images[0].url;
+    }
+
+    if (els.photoList) {
+      c.gallery = Array.from(els.photoList.querySelectorAll(".item-row")).map(row => ({
+        url: row.querySelector('[data-field="url"]')?.value.trim() || "",
+        caption: row.querySelector('[data-field="caption"]')?.value.trim() || ""
+      }));
+    }
+
+    if (els.videoList) {
+      c.videos = Array.from(els.videoList.querySelectorAll(".item-row")).map(row => ({
+        url: row.querySelector('[data-field="url"]')?.value.trim() || "",
+        caption: row.querySelector('[data-field="caption"]')?.value.trim() || ""
+      }));
+    }
+
+    if (els.servicesList) {
+      c.services = Array.from(els.servicesList.querySelectorAll(".item-row")).map(row => ({
+        title: row.querySelector('[data-field="title"]')?.value.trim() || "",
+        text: row.querySelector('[data-field="text"]')?.value.trim() || ""
+      }));
+    }
+
+    if (els.processList) {
+      c.process = Array.from(els.processList.querySelectorAll(".item-row")).map(row => ({
+        title: row.querySelector('[data-field="title"]')?.value.trim() || "",
+        text: row.querySelector('[data-field="text"]')?.value.trim() || ""
+      }));
+    }
   }
 
   boot();
