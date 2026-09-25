@@ -105,6 +105,16 @@ const DEFAULT_CONTENT = {
     scrollRevealActive: true
   },
 
+  sections: {
+    hero: true,
+    about: true,
+    services: true,
+    process: true,
+    gallery: true,
+    videos: true,
+    contact: true
+  },
+
   backgrounds: {
     hero: { image: "", opacity: 0.35 },
     about: { image: "", opacity: 0.20 },

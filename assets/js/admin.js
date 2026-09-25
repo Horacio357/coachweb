@@ -100,6 +100,16 @@
     els.shell.classList.remove("visible");
   }
 
+  function setupSectionToggles() {
+    document.querySelectorAll("[data-section]").forEach(cb => {
+      cb.addEventListener("change", (e) => {
+        const key = e.target.getAttribute("data-section");
+        const isChecked = e.target.checked;
+        document.querySelectorAll(`[data-section="${key}"]`).forEach(el => el.checked = isChecked);
+      });
+    });
+  }
+
   async function showPanel() {
     els.loginScreen.style.display = "none";
     els.shell.style.display = "block";
@@ -109,6 +119,7 @@
     populateForm();
     setupOpacitySliders();
     setupFileUploads();
+    setupSectionToggles();
   }
 
   /* ---------------- analytics ---------------- */
@@ -392,6 +403,13 @@
     // Cinta y Colores
     document.getElementById("ribbon-active").checked = !!c.ribbon.active;
     document.getElementById("ribbon-text").value = c.ribbon.text || "";
+
+    // Visibilidad de Secciones
+    const sec = c.sections || {};
+    ["hero", "about", "services", "process", "gallery", "videos", "contact"].forEach(key => {
+      const isVis = sec[key] !== false;
+      document.querySelectorAll(`[data-section="${key}"]`).forEach(cb => cb.checked = isVis);
+    });
 
     // Efectos
     const eff = c.effects || {};
@@ -860,6 +878,13 @@
     // Cinta y Colores
     c.ribbon.active = document.getElementById("ribbon-active").checked;
     c.ribbon.text = document.getElementById("ribbon-text").value.trim();
+
+    // Visibilidad de Secciones
+    c.sections = c.sections || {};
+    ["hero", "about", "services", "process", "gallery", "videos", "contact"].forEach(key => {
+      const cb = document.querySelector(`[data-section="${key}"]`);
+      if (cb) c.sections[key] = cb.checked;
+    });
 
     // Efectos
     c.effects = c.effects || {};

@@ -583,6 +583,35 @@
     }
   }
 
+  function applySectionVisibility(sections) {
+    const s = sections || {};
+    const secMap = {
+      hero: { sec: document.querySelector(".hero"), nav: null },
+      about: { sec: document.getElementById("about"), nav: document.getElementById("nav-about") },
+      services: { sec: document.getElementById("services"), nav: document.getElementById("nav-services") },
+      process: { sec: document.getElementById("process"), nav: document.getElementById("nav-process") },
+      gallery: { sec: document.getElementById("gallery"), nav: document.getElementById("nav-gallery") },
+      videos: { sec: document.getElementById("videos"), nav: document.getElementById("nav-videos") },
+      contact: { sec: document.getElementById("contact"), nav: document.getElementById("nav-contact") }
+    };
+
+    Object.entries(secMap).forEach(([key, item]) => {
+      const isVisible = s[key] !== false;
+      if (item.sec) {
+        if (isVisible) {
+          item.sec.style.display = "";
+          item.sec.removeAttribute("hidden");
+        } else {
+          item.sec.style.display = "none";
+          item.sec.setAttribute("hidden", "true");
+        }
+      }
+      if (item.nav) {
+        item.nav.style.display = isVisible ? "" : "none";
+      }
+    });
+  }
+
   async function init() {
     // Red de seguridad: revelar elementos tras un instante para evitar pantallas negras
     setTimeout(() => {
@@ -599,6 +628,7 @@
     }
 
     safeRun(() => applyColors(content.colors), "Colors");
+    safeRun(() => applySectionVisibility(content.sections), "SectionVisibility");
     safeRun(() => renderBackgrounds(content.backgrounds), "Backgrounds");
     safeRun(() => renderNav(content.nav), "Nav");
     safeRun(() => renderRibbon(content.ribbon), "Ribbon");

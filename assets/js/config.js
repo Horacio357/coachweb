@@ -24,6 +24,17 @@ const DEFAULT_CONTENT = {
     scrollRevealActive: true
   },
 
+  // --- VISIBILIDAD DE SECCIONES ---
+  sections: {
+    hero: true,
+    about: true,
+    services: true,
+    process: true,
+    gallery: true,
+    videos: true,
+    contact: true
+  },
+
   // --- FOTOS DE FONDO Y OPACIDAD ---
   backgrounds: {
     hero: { image: "", opacity: 0.35 },
